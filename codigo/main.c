@@ -11,7 +11,8 @@
 
 
 int main() {
-	STATE st = {20,20};
+	STATE st = {20,20,100,10,10};
+
 	MOB mob = {10,10,10,10,10};
 	int num_mobs = 10;
 

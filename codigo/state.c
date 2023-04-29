@@ -7,15 +7,6 @@
 #include "state.h"
 #include "mapa.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ncurses.h>
-#include <time.h>
-
-#include "state.h"
-#include "mapa.h"
-
 #define MAX_MOBS 10
 
 void do_movement_action(STATE *st, int dx, int dy) {

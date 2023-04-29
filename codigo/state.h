@@ -1,16 +1,8 @@
 #ifndef ___STATE_H___
 #define ___STATE_H___
-    
 
-/**
- *
- * Falta muita coisa, incluindo por exemplo:
- * - o mapa
- * - os monstros
- * - a fila de prioridade para saber quem se move
- * - o que está em cada casa
- *
- */
+#include "mapa.h"
+
 typedef struct {
     int x;
     int y;
@@ -19,11 +11,13 @@ typedef struct {
     int def;
 } MOB;
 
-typedef struct state {
+typedef struct {
     int playerX;
     int playerY;
+    int playerHp;
+    int playerAtk;
+    int playerDef;
 } STATE;
-
 
 void do_movement_action(STATE *st, int dx, int dy);
 void update(STATE *st, MOB *mobs, int num_mobs);
