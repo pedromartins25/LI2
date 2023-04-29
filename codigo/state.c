@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ncurses.h>
+#include <time.h>
+
+#include "state.h"
+#include "mapa.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ncurses.h>
+#include <time.h>
+
+#include "state.h"
+#include "mapa.h"
+
+#define MAX_MOBS 10
+
+void do_movement_action(STATE *st, int dx, int dy) {
+	st->playerX += dx;
+	st->playerY += dy;
+}
+
+void update(STATE *st, MOB *mobs, int num_mobs) {
+    int key = getch();
+
+	mvaddch(st->playerX, st->playerY, ' ');
+	switch(key) {
+		case KEY_A1:
+		case '7': do_movement_action(st, -1, -1); break;
+		case KEY_UP:
+		case '8': do_movement_action(st, -1, +0); break;
+		case KEY_A3:
+		case '9': do_movement_action(st, -1, +1); break;
+		case KEY_LEFT:
+		case '4': do_movement_action(st, +0, -1); break;
+		case KEY_B2:
+		case '5': break;
+		case KEY_RIGHT:
+		case '6': do_movement_action(st, +0, +1); break;
+		case KEY_C1:
+		case '1': do_movement_action(st, +1, -1); break;
+		case KEY_DOWN:
+		case '2': do_movement_action(st, +1, +0); break;
+		case KEY_C3:
+		case '3': do_movement_action(st, +1, +1); break;
+		case 'q': endwin(); exit(0); break;
+	}
+
+    // atualiza o estado dos inimigos
+    for (int i = 0; i < num_mobs; i++) {
+        // verifique se o inimigo está vivo
+        if (mobs[i].hp > 0) {
+            // verifique se o inimigo está adjacente ao jogador
+            if ((abs(mobs[i].x - st->playerX) <= 1) && (abs(mobs[i].y - st->playerY) <= 1)) {
+                // inicie uma batalha
+                int damage_to_player = mobs[i].atk - st->playerDef;
+                int damage_to_mob = st->playerAtk - mobs[i].def;
+                if (damage_to_player > 0) {
+                    st->playerHp -= damage_to_player;
+                }
+                if (damage_to_mob > 0) {
+                    mobs[i].hp -= damage_to_mob;
+                }
+            } else {
+                // caso contrário, mova o inimigo aleatoriamente
+                int dx = rand() % 3 - 1;
+                int dy = rand() % 3 - 1;
+                if (dx != 0 || dy != 0) {
+                    int new_x = mobs[i].x + dx;
+                    int new_y = mobs[i].y + dy;
+                    if (mapa_pode_andar(st->map, new_x, new_y)) {
+                        mobs[i].x = new_x;
+                        mobs[i].y = new_y;
+                    }
+                }
+            }
+            // renderize o inimigo na tela
+            mvaddch(mobs[i].x, mobs[i].y, 'M');
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
