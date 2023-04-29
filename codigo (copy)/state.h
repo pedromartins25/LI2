@@ -11,7 +11,7 @@ typedef struct {
     int def;
 } MOB;
 
-typedef struct STATE {
+typedef struct {
     int playerX;
     int playerY;
     int playerHp;
@@ -20,6 +20,6 @@ typedef struct STATE {
 } STATE;
 
 void do_movement_action(STATE *st, int dx, int dy);
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols);
+void update(STATE *st, MOB *mobs, int num_mobs);
 
 #endif

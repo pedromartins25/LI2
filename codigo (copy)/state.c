@@ -10,41 +10,33 @@
 #define MAX_MOBS 10
 
 void do_movement_action(STATE *st, int dx, int dy) {
-int new_x = st->playerX + dx;
-int new_y = st->playerY + dy;
-  if (mapa_pode_andar(new_x, new_y)) {
 	st->playerX += dx;
 	st->playerY += dy;
- }
 }
 
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
+void update(STATE *st, MOB *mobs, int num_mobs) {
     int key = getch();
 
-        init_color(COLOR_GREEN, 500, 500, 500);
-        init_pair(2,COLOR_BLACK, COLOR_GREEN);
-        attron(COLOR_PAIR(2));
 	mvaddch(st->playerX, st->playerY, ' ');
-	attroff(COLOR_PAIR(2));
 	switch(key) {
 		case KEY_A1:
-		case '7': endmap(st, 1, rows, cols), do_movement_action(st, -1, -1), drawlight(st, rows, cols); break;
+		case '7': do_movement_action(st, -1, -1); break;
 		case KEY_UP:
-		case '8': endmap(st, 1, rows, cols), do_movement_action(st, -1, +0), drawlight(st, rows, cols); break;
+		case '8': do_movement_action(st, -1, +0); break;
 		case KEY_A3:
-		case '9': endmap(st, 1, rows, cols), do_movement_action(st, -1, +1), drawlight(st, rows, cols); break;
+		case '9': do_movement_action(st, -1, +1); break;
 		case KEY_LEFT:
-		case '4': endmap(st, 3, rows, cols), do_movement_action(st, +0, -1), drawlight(st, rows, cols); break;
+		case '4': do_movement_action(st, +0, -1); break;
 		case KEY_B2:
 		case '5': break;
 		case KEY_RIGHT:
-		case '6': endmap(st, 4, rows, cols), do_movement_action(st, +0, +1), drawlight(st, rows, cols); break;
+		case '6': do_movement_action(st, +0, +1); break;
 		case KEY_C1:
-		case '1': endmap(st, 2, rows, cols), do_movement_action(st, +1, -1), drawlight(st, rows, cols); break;
+		case '1': do_movement_action(st, +1, -1); break;
 		case KEY_DOWN:
-		case '2': endmap(st, 2, rows, cols), do_movement_action(st, +1, +0), drawlight(st, rows, cols); break;
+		case '2': do_movement_action(st, +1, +0); break;
 		case KEY_C3:
-		case '3': endmap(st, 2, rows, cols), do_movement_action(st, +1, +1), drawlight(st, rows, cols); break;
+		case '3': do_movement_action(st, +1, +1); break;
 		case 'q': endwin(); exit(0); break;
 	}
 
@@ -68,14 +60,9 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
                 int dx = rand() % 3 - 1;
                 int dy = rand() % 3 - 1;
                 if (dx != 0 || dy != 0) {
-                    init_color(COLOR_GREEN, 500, 500, 500);
-                    init_pair(2,COLOR_BLACK, COLOR_GREEN);
-                    attron(COLOR_PAIR(2));
-              	    mvaddch(mobs[i].x, mobs[i].y, ' ');
-	            attroff(COLOR_PAIR(2));
                     int new_x = mobs[i].x + dx;
                     int new_y = mobs[i].y + dy;
-                    if (mapa_pode_andar(new_x, new_y)) {
+                    if (mapa_pode_andar(st->map, new_x, new_y)) {
                         mobs[i].x = new_x;
                         mobs[i].y = new_y;
                     }
