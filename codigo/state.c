@@ -21,8 +21,6 @@ int new_y = st->playerY + dy;
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
     int key = getch();
 
-        init_color(COLOR_GREEN, 500, 500, 500);
-        init_pair(2,COLOR_BLACK, COLOR_GREEN);
         attron(COLOR_PAIR(2));
 	mvaddch(st->playerX, st->playerY, ' ');
 	attroff(COLOR_PAIR(2));
