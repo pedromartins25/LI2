@@ -338,7 +338,7 @@ char c;
   }
  if (d==4) {  // no caso de o player ter movido da parede direita
   for (i=x-6; i<=x+6 && i<=rows; i++){
-   for (j=y-1; j>=y-11; j--){
+   for (j=y; j>=y-11; j--){
         c = mvinch (i,j);
         eraseaux(c,i,j);
     }
