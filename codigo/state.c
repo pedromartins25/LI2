@@ -26,23 +26,23 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
 	attroff(COLOR_PAIR(2));
 	switch(key) {
 		case KEY_A1:
-		case '7': endmap(st, 1, rows, cols), do_movement_action(st, -1, -1), drawlight(st, rows, cols); break;
+		case '7': endmap(st, 1, rows, cols), nextlevel(st, 1, rows, cols), do_movement_action(st, -1, -1), drawlight(st, rows, cols); break;
 		case KEY_UP:
-		case '8': endmap(st, 1, rows, cols), do_movement_action(st, -1, +0), drawlight(st, rows, cols); break;
+		case '8': endmap(st, 1, rows, cols), nextlevel(st, 1, rows, cols), do_movement_action(st, -1, +0), drawlight(st, rows, cols); break;
 		case KEY_A3:
-		case '9': endmap(st, 1, rows, cols), do_movement_action(st, -1, +1), drawlight(st, rows, cols); break;
+		case '9': endmap(st, 1, rows, cols), nextlevel(st, 1, rows, cols), do_movement_action(st, -1, +1), drawlight(st, rows, cols); break;
 		case KEY_LEFT:
-		case '4': endmap(st, 3, rows, cols), do_movement_action(st, +0, -1), drawlight(st, rows, cols); break;
+		case '4': endmap(st, 3, rows, cols), nextlevel(st, 3, rows, cols), do_movement_action(st, +0, -1), drawlight(st, rows, cols); break;
 		case KEY_B2:
 		case '5': break;
 		case KEY_RIGHT:
-		case '6': endmap(st, 4, rows, cols), do_movement_action(st, +0, +1), drawlight(st, rows, cols); break;
+		case '6': endmap(st, 4, rows, cols), nextlevel(st, 4, rows, cols), do_movement_action(st, +0, +1), drawlight(st, rows, cols); break;
 		case KEY_C1:
-		case '1': endmap(st, 2, rows, cols), do_movement_action(st, +1, -1), drawlight(st, rows, cols); break;
+		case '1': endmap(st, 2, rows, cols), nextlevel(st, 2, rows, cols), do_movement_action(st, +1, -1), drawlight(st, rows, cols); break;
 		case KEY_DOWN:
-		case '2': endmap(st, 2, rows, cols), do_movement_action(st, +1, +0), drawlight(st, rows, cols); break;
+		case '2': endmap(st, 2, rows, cols), nextlevel(st, 2, rows, cols), do_movement_action(st, +1, +0), drawlight(st, rows, cols); break;
 		case KEY_C3:
-		case '3': endmap(st, 2, rows, cols), do_movement_action(st, +1, +1), drawlight(st, rows, cols); break;
+		case '3': endmap(st, 2, rows, cols), nextlevel(st, 2, rows, cols),do_movement_action(st, +1, +1), drawlight(st, rows, cols); break;
 		case 'q': endwin(); exit(0); break;
 	}
 

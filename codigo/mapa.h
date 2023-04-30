@@ -13,4 +13,6 @@ int mapa_pode_andar (int x, int y);
 
 void endmap(STATE *st, int i, int rows, int cols);
 
+void nextlevel(STATE *st, int i, int rows, int cols);
+
 #endif

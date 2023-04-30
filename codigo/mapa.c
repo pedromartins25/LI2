@@ -159,42 +159,64 @@ void template10(int w, int k) {
     attroff(COLOR_PAIR(1));
 }
 
+void template11(int w, int k) {
+    attron(COLOR_PAIR(1));
+    mvprintw(w*10, k*10,   "hhhh..hhhh");
+    mvprintw(w*10+1, k*10, "h........h");
+    mvprintw(w*10+2, k*10, "h........h");
+    mvprintw(w*10+3, k*10, "h........h");
+    mvprintw(w*10+4, k*10, "....ss....");
+    mvprintw(w*10+5, k*10, "....ss....");
+    mvprintw(w*10+6, k*10, "h........h");
+    mvprintw(w*10+7, k*10, "h........h");
+    mvprintw(w*10+8, k*10, "h........h");
+    mvprintw(w*10+9, k*10, "hhhh..hhhh");
+    attroff(COLOR_PAIR(1));
+}
+
   // Restrem a criação de novas salas para o mapa ser compativel
 int correct_template(int pt) {
 int c;
- if (pt == 1 || pt == 4 || pt == 5) {
-  c = (rand() % ((8-1) + 1)) + 1;
-   if (c != 1 && c != 2) c++;
-  return c;
- }
- else{
-  if (pt == 7 || pt == 8) {
-   c = (rand() % ((7-1) + 1)) + 1;
-   if (c != 1) c += 3;
+  if (pt == 1 || pt == 4 || pt == 5) {
+   c = (rand() % ((8-1) + 1)) + 1;
+    if (c != 1 && c != 2) c++;
    return c;
   }
-  else {
-   if (pt == 10) {
-    c = (rand() % ((3-2) + 2)) + 2;
-    if (c != 2) c = 10;
+  else{
+   if (pt == 7 || pt == 8) {
+    c = (rand() % ((7-1) + 1)) + 1;
+    if (c != 1) c += 3;
+    return c;
    }
    else {
-   c = (rand() % ((10-1) + 1)) + 1;
-   return c;
+    if (pt == 10) {
+     c = (rand() % ((3-2) + 2)) + 2;
+     if (c != 2) c = 10;
+    }
+    else {
+     c = (rand() % ((10-1) + 1)) + 1;
+     return c;
+    }
    }
   }
- }
- return 2;
+  return 2;
 }
 
   // Cria a matriz com os numeros aleatorios que representam salas
 void generate_template(int templateRows, int templateCols, int templateMap[templateRows][templateCols]) {
 int i,j;
+ i = (rand() % (((templateRows/10-1)-1)+1)) + 1;
+ j = (rand() % (((templateCols/10-1)-1)+1)) + 1; 
+ templateMap[i][j] = 11;
  for (i=0; i<templateRows; i++) {
   for (j=0; j<templateCols; j++) {
    if (i==0 && j==0) templateMap[i][j] = 2;  // cria a primeira sala para ser sempre compativel
    else if (i>0 && j==0) templateMap[i][j] = correct_template(templateMap[i-1][0]);  // restrem a criação da primeira coluna
-        else templateMap[i][j] = correct_template(templateMap[i][j-1]);  // cria aleatoriamente tendo em consideração a sala anterior
+        else {
+        if (templateMap[i][j] == 0){
+         templateMap[i][j] = correct_template(templateMap[i][j-1]);  // cria aleatoriamente tendo em consideração a sala anterior
+        }
+       }
   }
  }
 }
@@ -220,6 +242,7 @@ int y=(templateCols)/10;  // criamos novos máximos com isso em consideração
         case 8: template8(i,j); break;
         case 9: template9(i,j); break;
         case 10: template10(i,j); break;
+        case 11: template11(i,j); break;
   }
   }
  }
@@ -260,18 +283,21 @@ void eraseaux(char c, int j, int i){
  
   // Transforma blocos sem luz em bloco com luz
 void lightaux(char c, int j, int i) {
-    if (c=='.' || c=='-') {
+    if (c=='.' || c=='-') {  // transforma o chão não iluminado
      attron(COLOR_PAIR(2));
      mvaddch(j,i,' ');
      attroff(COLOR_PAIR(2)); 
     }
-    else {
-     if (c=='h' || c=='+') {
+    if (c=='h' || c=='+') {  // transforma as paredes não iluminadas
      attron(COLOR_PAIR(3));
      mvaddch(j,i,'H');
      attroff(COLOR_PAIR(3)); 
-     }
-  }
+    }
+    if (c=='s') {  // transforma as escadas não iluminadas
+     attron(COLOR_PAIR(COLOR_WHITE));
+     mvaddch(j,i,'S');
+     attroff(COLOR_PAIR(COLOR_WHITE));
+    }
 }
 
   // Função que simula luz
@@ -281,8 +307,8 @@ int a, i;
 double dx, dy, rx, ry;
 char c;
   for (a=0; a<360; a++) {  // Vai por os angulos de 0 a 360
-   dx = sin(a*M_PI/180);  // cria o vetor de direção
-   dy = cos(a*M_PI/180);
+   dx = cos(a*M_PI/180);  // cria o vetor de direção
+   dy = sin(a*M_PI/180);
    rx = x + dx; ry = y + dy;  // atualiza os "raios"
    i=0;
    while (rx >= 0 && rx < r && ry >= 0 && ry < co && ((rx-x)*(rx-x) + (ry-y)*(ry-y)) <= 49) { // restrem dentro das paredes do mapa total e a uma distancia 7 do player
@@ -321,15 +347,15 @@ char c;
    }
   }
  if (d==2) {  // no caso de o player ter movido da parede inferior
-  for (i=x-11; i<=x && i<=rows; i++){
-   for (j=y-6; j<=y+6 && j<=cols; j++){
+  for (i=x-11; i<=x && i<rows; i++){
+   for (j=y-6; j<=y+6 && j<cols; j++){
         c = mvinch (i,j);
         eraseaux(c,i,j);
     }
    }
   }
  if (d==3) {  // no caso de o player ter movido da parede esquerda
-  for (i=x-6; i<=x+6 && i<=rows; i++){
+  for (i=x-6; i<=x+6 && i<rows; i++){
    for (j=y+11; j>=y; j--){
         c = mvinch (i,j);
         eraseaux(c,i,j);
@@ -337,7 +363,7 @@ char c;
    }
   }
  if (d==4) {  // no caso de o player ter movido da parede direita
-  for (i=x-6; i<=x+6 && i<=rows; i++){
+  for (i=x-6; i<=x+6 && i<rows; i++){
    for (j=y; j>=y-11; j--){
         c = mvinch (i,j);
         eraseaux(c,i,j);
@@ -384,6 +410,40 @@ if (i == 4) {  // no caso de estar na parede direita
    erase_light(x,y,4,rows,cols);
  }
  else st->playerY--;
+ }
+}
+}
+
+void nextlevel(STATE *st, int i, int rows, int cols) {
+int x = st->playerX;
+int y = st->playerY;
+char c;
+if (i == 1) {  // no caso de andar para cima
+ c = mvinch(x-1,y);
+ if (c == 'S') {
+  gerarMundo(st, rows, cols);
+  st->playerX=6; st->playerY=5;
+ }
+}
+if (i == 2) {  // no caso de andar para baixo
+ c = mvinch(x+1,y);
+ if (c == 'S') {
+  gerarMundo(st, rows, cols);
+  st->playerX=4; st->playerY=5;
+ }
+}
+if (i == 3) {  // no caso de andar para a esquerda
+ c = mvinch(x,y-1);
+ if (c == 'S') {
+  gerarMundo(st, rows, cols);
+  st->playerX=5; st->playerY=6;
+ }
+}
+if (i == 4) {  // no caso de andar para a direita
+ c = mvinch(x,y+1);
+ if (c == 'S') {
+  gerarMundo(st, rows, cols);
+  st->playerX=5; st->playerY=4;
  }
 }
 }
