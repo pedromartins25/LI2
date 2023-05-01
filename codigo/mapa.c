@@ -18,7 +18,7 @@ Item items[7] = {
     {7, 8, 'i'}, // BOMBA INCENDIÁRIA
     {9,10, 'f'}, // FLASHBANG
     {11,12,'*'}, // Nightstick
-    {13,14, 'S'} // BOMBA DE FUMO
+    {13,14, 'G'} // BOMBA DE FUMO
 };
 
 
@@ -260,16 +260,11 @@ int y=(templateCols)/10;  // criamos novos máximos com isso em consideração
   }
   }
  }
-}
-
-  // função principal da criação de mapas
-void gerarMundo(STATE *s, int templateRows, int templateCols) {
-	s->playerX = 5;
-	s->playerY = 5;
-	s->playerHp = 100;
-	s->playerAtk = 10;
-	s->playerDef = 10;
-	generate_map(templateRows, templateCols);
+ for (i=0; i<x;i++) {
+  for (j=0; j<y; j++) {
+   templateMap[i][j] = 0;
+  }
+ }
 }
 
   // Verifica se a entidade pode fazer um certo movimento
@@ -297,21 +292,30 @@ void eraseaux(char c, int j, int i){
  
   // Transforma blocos sem luz em bloco com luz
 void lightaux(char c, int j, int i) {
-    if (c=='.' || c=='-') {  // transforma o chão não iluminado
+    if (c=='.' || c=='-' || c==' ') {  // transforma o chão não iluminado
      attron(COLOR_PAIR(2));
      mvaddch(j,i,' ');
      attroff(COLOR_PAIR(2)); 
     }
-    if (c=='h' || c=='+') {  // transforma as paredes não iluminadas
+    else {
+    if (c=='h' || c=='+' || c=='H') {  // transforma as paredes não iluminadas
      attron(COLOR_PAIR(3));
      mvaddch(j,i,'H');
      attroff(COLOR_PAIR(3)); 
     }
-    if (c=='s') {  // transforma as escadas não iluminadas
+    else {
+    if (c=='s' || c=='S') {  // transforma as escadas não iluminadas
      attron(COLOR_PAIR(COLOR_WHITE));
      mvaddch(j,i,'S');
      attroff(COLOR_PAIR(COLOR_WHITE));
     }
+    else {
+     attron(COLOR_PAIR(COLOR_WHITE));
+     mvaddch(j,i,c);
+     attroff(COLOR_PAIR(COLOR_WHITE));
+    }
+   }
+  }
 }
 
   // Função que simula luz
@@ -435,56 +439,108 @@ char c;
 if (i == 1) {  // no caso de andar para cima
  c = mvinch(x-1,y);
  if (c == 'S') {
-  gerarMundo(st, rows, cols);
+  gerarMundo(rows, cols);
   st->playerX=6; st->playerY=5;
  }
 }
 if (i == 2) {  // no caso de andar para baixo
  c = mvinch(x+1,y);
  if (c == 'S') {
-  gerarMundo(st, rows, cols);
+  gerarMundo(rows, cols);
   st->playerX=4; st->playerY=5;
  }
 }
 if (i == 3) {  // no caso de andar para a esquerda
  c = mvinch(x,y-1);
  if (c == 'S') {
-  gerarMundo(st, rows, cols);
+  gerarMundo(rows, cols);
   st->playerX=5; st->playerY=6;
  }
 }
 if (i == 4) {  // no caso de andar para a direita
  c = mvinch(x,y+1);
  if (c == 'S') {
-  gerarMundo(st, rows, cols);
+  gerarMundo(rows, cols);
   st->playerX=5; st->playerY=4;
  }
 }
 }
 
 
-Item gerar_Random_item(int templateRows, int templateCols) {
+void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatóriamente as coordenadas e tipo do item
     int x, y, r;
+    Item item;
+    
+        x = (rand() % (((templateRows)-1)+1)) + 1;
+        y = (rand() % (((templateCols)-1)+1)) + 1;
+        r = rand() % 7;
 
-    srand(time(NULL));
-    while (1) {
-        x = (rand() % (((templateRows/10-1)-1)+1)) + 1;
-        y = (rand() % (((templateCols/10-1)-1)+1)) + 1;
-        r = rand() % 8;
-
-        if (mapa_pode_andar(x, y)) {
-            return items[r];
+        item = items[r];
+        while (mapa_pode_andar(x, y) != 1) {
+         x = (rand() % (((templateRows)-1)+1)) + 1;
+         y = (rand() % (((templateCols)-1)+1)) + 1;        
         }
-    }
+       attron(COLOR_PAIR(1));
+       mvaddch(x, y, item.symbol);
+       attron(COLOR_PAIR(1));
+       refresh();
 }
 
-void adicionar_item(Item item) {
-    int num_items = 0;
-
-    if (num_items < N_MAXIMO_ITEMS) {
-        mvaddch(item.lin, item.cols, item.symbol);
-        num_items++;
-    }
-
-    refresh();
+void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
+ switch(c) {
+  case '!': st->playerAtk += 2; st->inv[st->len]=1; st->len++; break;
+  case '|': st->playerAtk += 5; st->inv[st->len]=2; st->len++; break;
+  case 'd': st->playerDef += 2; st->inv[st->len]=3; st->len++; break;
+  case 'i': st->inv[st->len]=4; st->len++; break;
+  case 'f': st->inv[st->len]=5; st->len++; break;
+  case '*': st->inv[st->len]=6; st->len++; break;
+  case 'G': st->inv[st->len]=7; st->len++; break;
+ }
 }
+
+void inventory(int i,int row,int col) {  // Faz print dos items no inventario
+  switch(i) {
+   case 0: break;
+   case 1: mvprintw(row, col, "Faca  | "); break;
+   case 2: mvprintw(row, col, "Espada| "); break;
+   case 3: mvprintw(row, col, "BB D  | "); break;
+   case 4: mvprintw(row, col, "BB I  | "); break;
+   case 5: mvprintw(row, col, "Flash | "); break;
+   case 6: mvprintw(row, col, "Torch | "); break;
+   case 7: mvprintw(row, col, "BB F  | "); break;
+  }
+}
+
+void itemPickUp(STATE *st, int i) {
+int x = st->playerX;
+int y = st->playerY;
+char c;
+if (i == 1) {  // no caso de andar para cima
+ c = mvinch(x-1,y);
+ itemUpdate(st, c);
+}
+if (i == 2) {  // no caso de andar para baixo
+ c = mvinch(x+1,y);
+ itemUpdate(st, c);
+}
+if (i == 3) {  // no caso de andar para a esquerda
+ c = mvinch(x,y-1);
+ itemUpdate(st, c);
+}
+if (i == 4) {  // no caso de andar para a direita
+ c = mvinch(x,y+1);
+ itemUpdate(st, c);
+}
+}
+
+  // função principal da criação de mapas
+void gerarMundo(int templateRows, int templateCols) {
+int i;
+
+	generate_map(templateRows, templateCols);
+	for (i=0; i < N_MAXIMO_ITEMS; i++) {  // cria um certo número de items
+         gerar_Random_item(templateRows, templateCols); // funções para adicionar itens
+        }
+}
+
+

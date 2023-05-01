@@ -17,6 +17,8 @@ typedef struct STATE {
     int playerHp;
     int playerAtk;
     int playerDef;
+    int inv[1000];
+    int len;
 } STATE;
 
 void do_movement_action(STATE *st, int dx, int dy);

@@ -34,7 +34,7 @@ void update_stats_window(WINDOW *stats_window, STATE *st) {
 
 
 int main() {
-	STATE st = {20,20,100,10,10};
+	STATE st = {5,5,100,10,10,{0},0};
 
 	MOB mob = {15,15,10,10,10};
 	int num_mobs = 10;
@@ -69,8 +69,9 @@ int main() {
         init_pair(4, DARKFLOOR, DARKFLOOR);
         init_pair(5, WALL, DARKWALL);
         init_pair(15,COLOR_BLUE, COLOR_BLACK);
+        init_pair(16,COLOR_BLACK, COLOR_RED);
 
-	gerarMundo(&st, templateRows, templateCols);
+	gerarMundo(templateRows, templateCols);
 	drawlight(&st, templateRows, templateCols);
 
 	    // inicializa a tela do ncurses
@@ -102,7 +103,6 @@ int main() {
 		update(&st, &mob, num_mobs, templateRows, templateCols);
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
-        adicionar_item(gerar_Random_item(templateRows, templateCols)); // funções para adicionar itens
 	}
 
 

@@ -12,7 +12,7 @@ typedef struct {
 } Item;
 
 
-void gerarMundo(STATE *s, int templateRows, int templateCols);
+void gerarMundo(int templateRows, int templateCols);
 
 void drawlight(STATE *st, int r, int co);
 
@@ -22,10 +22,11 @@ void endmap(STATE *st, int i, int rows, int cols);
 
 void nextlevel(STATE *st, int i, int rows, int cols);
 
-Item gerar_Random_item(int templateRows, int templateCols);
+void gerar_Random_item(int templateRows, int templateCols);
 
-void adicionar_item(Item item);
+void itemPickUp(STATE *st, int i);
 
+void inventory(int i,int row,int col);
 
 
 #endif
