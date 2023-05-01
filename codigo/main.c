@@ -52,7 +52,8 @@ int main() {
 	nonl();
 	intrflush(stdscr, false);
 	keypad(stdscr, true);
- 
+	
+ 	if (nrows>30 && ncols >30) {
            // inicialização das cores e os pairs necessários
         init_color(STATS, 100,200,700);
         init_color(DARKFLOOR,250,250,250);
@@ -104,11 +105,10 @@ int main() {
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
 	}
-
-
-	    // limpa a janela de stats e encerra o ncurses
-    delwin(stats_window);
-    endwin();
-
+    // limpa a janela de stats e encerra o ncurses
+     delwin(stats_window);
+     endwin();
+   }
+   else{endwin(); printf("%s\n","Aumente a janela");}
 	return 0;
 }
