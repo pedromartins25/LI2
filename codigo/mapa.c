@@ -8,6 +8,20 @@
 #include "state.h"
 #include "mapa.h"
 
+#define N_MAXIMO_ITEMS 20
+
+
+Item items[7] = {
+    {1, 2, '!'}, // FACA
+    {3, 4, '|'}, // Espada
+    {5, 6, 'd'}, // BOMBA DEFENSIVA
+    {7, 8, 'i'}, // BOMBA INCENDIÁRIA
+    {9,10, 'f'}, // FLASHBANG
+    {11,12,'*'}, // Nightstick
+    {13,14, 'S'} // BOMBA DE FUMO
+};
+
+
  // Listagem das salas posiveis do mapa
 void template1(int w, int k) {
     attron(COLOR_PAIR(1));
@@ -448,3 +462,29 @@ if (i == 4) {  // no caso de andar para a direita
 }
 }
 
+
+Item gerar_Random_item(int templateRows, int templateCols) {
+    int x, y, r;
+
+    srand(time(NULL));
+    while (1) {
+        x = (rand() % (((templateRows/10-1)-1)+1)) + 1;
+        y = (rand() % (((templateCols/10-1)-1)+1)) + 1;
+        r = rand() % 8;
+
+        if (mapa_pode_andar(x, y)) {
+            return items[r];
+        }
+    }
+}
+
+void adicionar_item(Item item) {
+    static int num_items = 0;
+
+    if (num_items < N_MAXIMO_ITEMS) {
+        mvaddch(item.lin, item.cols, item.symbol);
+        num_items++;
+    }
+
+    refresh();
+}
