@@ -7,32 +7,6 @@
 #include "state.h"
 #include "mapa.h"
 
-#define MAX_MOBS 10
-#define TEMPLATE_SIZE 10
-#define DARKFLOOR 8
-#define FLOOR 11
-#define WALL 10
-#define DARKWALL 9
-#define STATS 12
-
-
-void update_stats_window(WINDOW *stats_window, STATE *st) {
-    wclear(stats_window); // limpa a janela antes de atualizar
-
-    // adiciona os stats do player à janela
-    wattron(stats_window, COLOR_PAIR(STATS));
-    mvwprintw(stats_window, 1, 1, "HP: %d", st->playerHp);
-    mvwprintw(stats_window, 2, 1, "ATK: %d", st->playerAtk);
-    mvwprintw(stats_window, 3, 1, "DEF: %d", st->playerDef);
-    wattroff(stats_window, COLOR_PAIR(STATS));
-
-    wrefresh(stats_window); // atualiza a janela na tela
-}
-
-
-
-
-
 int main() {
 	STATE st = {5,5,100,10,10,{0},0};
 
@@ -110,5 +84,6 @@ int main() {
      endwin();
    }
    else{endwin(); printf("%s\n","Aumente a janela");}
-	return 0;
+
+   return 0;
 }

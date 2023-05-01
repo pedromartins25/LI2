@@ -3,6 +3,15 @@
 
 #include "state.h"
 
+#define N_MAXIMO_ITEMS 20
+#define MAX_MOBS 10
+#define TEMPLATE_SIZE 10
+#define DARKFLOOR 8
+#define FLOOR 11
+#define WALL 10
+#define DARKWALL 9
+#define STATS 12
+
 
 typedef struct STATE STATE;
 
