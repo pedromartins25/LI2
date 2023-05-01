@@ -97,14 +97,14 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
             mvaddch(mobs[i].x, mobs[i].y, 'M');
         }
     }
-   mvprintw(row, col, "Inventory: ");  // desenha o inventário
+   mvprintw(row, col, "Inventory: ");  // desenha o inventario
    col +=11;
    for (int i = 0; i <= st->len; i++) {
     if (col==cols-8) {
      row += 1; col = 5;
      }
     if (i < st->len) {
-    mvprintw(row,col,"%d", st->inv[i]);
+    inventory(st->inv[i], row, col);
     col+=1;
     }
  }
