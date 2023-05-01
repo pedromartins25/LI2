@@ -102,7 +102,7 @@ int main() {
 		update(&st, &mob, num_mobs, templateRows, templateCols);
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
-        adicionar_item(gerar_Random_item()) // funções para adicionar itens
+        adicionar_item(gerar_Random_item(templateRows, templateCols)); // funções para adicionar itens
 	}
 
 

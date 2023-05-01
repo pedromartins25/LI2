@@ -479,7 +479,7 @@ Item gerar_Random_item(int templateRows, int templateCols) {
 }
 
 void adicionar_item(Item item) {
-    static int num_items = 0;
+    int num_items = 0;
 
     if (num_items < N_MAXIMO_ITEMS) {
         mvaddch(item.lin, item.cols, item.symbol);
