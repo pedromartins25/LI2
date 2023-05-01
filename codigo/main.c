@@ -19,8 +19,8 @@ int main() {
 	templateRows = nrows - (nrows%TEMPLATE_SIZE) - TEMPLATE_SIZE; templateCols = ncols - (ncols%TEMPLATE_SIZE) - TEMPLATE_SIZE; // número de linhas e colunas do mapa
 
 	srandom(time(NULL));
-	start_color(); // Inicializa a biblioteca de cores do ncurses
-
+	start_color(); // Inicializa a biblioteca de cores do ncurse
+	curs_set(0);
 	cbreak();
 	noecho();
 	nonl();
@@ -45,6 +45,7 @@ int main() {
         init_pair(5, WALL, DARKWALL);
         init_pair(15,COLOR_BLUE, COLOR_BLACK);
         init_pair(16,COLOR_BLACK, COLOR_RED);
+        init_pair(17,COLOR_BLUE, FLOOR); // player color
 
 	gerarMundo(templateRows, templateCols);
 	drawlight(&st, templateRows, templateCols);
@@ -71,9 +72,9 @@ int main() {
 		attron(COLOR_PAIR(15));
 		printw("(%d, %d) %d %d", st.playerX, st.playerY, ncols, nrows);
 		attroff(COLOR_PAIR(15));
-		attron(COLOR_PAIR(COLOR_WHITE));
+		attron(COLOR_PAIR(17));
 		mvaddch(st.playerX, st.playerY, '@' | A_BOLD);
-		attroff(COLOR_PAIR(COLOR_WHITE));
+		attroff(COLOR_PAIR(17));
 		move(st.playerX, st.playerY);
 		update(&st, &mob, num_mobs, templateRows, templateCols);
 		        // atualiza a janela de stats
