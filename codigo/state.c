@@ -158,7 +158,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
         }
         if (i < st->len) {
             inventory(st->inv[i], row, col);
-            col+=1;
+            col+=8;
         }
     }
 }
