@@ -9,17 +9,6 @@
 #include "mapa.h"
 
 
-Item items[7] = {
-    {1, 2, '!'}, // FACA
-    {3, 4, '|'}, // Espada
-    {5, 6, 'd'}, // BOMBA DEFENSIVA
-    {7, 8, 'i'}, // BOMBA INCENDIÁRIA
-    {9,10, 'f'}, // FLASHBANG
-    {11,12,'*'}, // Nightstick
-    {13,14, 'G'} // BOMBA DE FUMO
-};
-
-
  // Listagem das salas posiveis do mapa
 void template1(int w, int k) {
     
@@ -248,6 +237,16 @@ void generate_template(int templateRows, int templateCols, int templateMap[templ
 }
 }
 
+void reset_map(int templateRows,int templateCols) {
+ for (int i = 0; i <= templateRows; i++) {
+  for (int j = 0; j <= templateCols; j++) {
+    attron(COLOR_PAIR(1));
+    mvaddch(i,j,' ');
+    attroff(COLOR_PAIR(1));
+  }
+ }
+}
+
   // Cria e desenhas o mapa
 void generate_map(int templateRows, int templateCols) {
     
@@ -304,16 +303,6 @@ for (i=0; i<x;i++) {
         templateMap[i][j] = 0;
     }
 }
-}
-
-void reset_map(int templateRows,int templateCols) {
- for (int i = 0; i <= templateRows; i++) {
-  for (int j = 0; j <= templateCols; j++) {
-    attron(COLOR_PAIR(1));
-    mvaddch(i,j,' ');
-    attroff(COLOR_PAIR(1));
-  }
- }
 }
 
   // Verifica se a entidade pode fazer um certo movimento
@@ -453,6 +442,7 @@ if (d==4) {  // no caso de o player ter movido da parede direita
   }
 }
 
+
   // Verifica se é possivel o player ir de uma parede do mapa para a oposta e se sim move o player
 void endmap(STATE *st, int i, int rows, int cols) {
     
@@ -506,7 +496,6 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
         if (c == 'S') {
-            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
         }
@@ -514,7 +503,6 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 2) {  // no caso de andar para baixo
         c = mvinch(x+1,y);
         if (c == 'S') {
-            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
         }
@@ -522,7 +510,6 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 3) {  // no caso de andar para a esquerda
         c = mvinch(x,y-1);
         if (c == 'S') {
-            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
         }
@@ -530,12 +517,22 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 4) {  // no caso de andar para a direita
         c = mvinch(x,y+1);
         if (c == 'S') {
-            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
         }
     }
 }
+
+Item items[8] = {{"Faca", 1, 2, '!',1,0},
+                 {"Espada", 3, 4, '|',2,0},
+                 {"Clava", 5, 6, '%',3,0},
+                 {"Bomba Defensiva", 7,8, 'D',4,1},
+                 {"Bomba Incendiária", 9, 10, 'I',5,1},
+                 {"Flashbang", 11, 12, 'F', 6,1},
+                 {"Nightstick", 13, 14, '*', 7,0},
+                 {"Bomba de fumo", 15,16, '#', 8,1}
+             };
+
 
 
 void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatóriamente as coordenadas e tipo do item
@@ -545,7 +542,7 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
     
         x = (rand() % (((templateRows)-1)+1)) + 1;
         y = (rand() % (((templateCols)-1)+1)) + 1;
-        r = rand() % 7;
+        r = rand() % 8;
 
         item = items[r];
         while (mapa_pode_andar(x, y) != 1) {
@@ -558,23 +555,19 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
        refresh();
 }
 
-void addItem(STATE *st, int i) {
- if (st->len == 0) {
-  st->inv.item = i;
-  st->inv.prox =  malloc(sizeof(struct Inventario));
+int typecheck(int t, int it) {
+ if (t == it) return 1;
+ return 0;
+}
+
+int exists(Item it, int len, Item inv[len]) {
+int i;
+ for (i=0; i<len; i++) {
+  if (typecheck(inv[i].type, it.type)) {
+   return 1;
+  }
  }
- else {
-    Inv *temp = st->inv.prox;
-    Inv *new_inv = malloc(sizeof(Inv));
-    new_inv->item = i;
-    new_inv->prox = NULL;
-     while (temp->prox != NULL) {
-       temp = temp->prox;
-    }
-     temp->prox = new_inv;
-    }
-   
-    st->len++;
+ return 0;
 }
 
 void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
@@ -582,58 +575,64 @@ void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modific
     switch(c) {
     case '!': 
         st->playerAtk += 2; 
-        addItem(st, 1);
+        st->inv[st->len]=items[0]; 
+        st->len++; 
         break;
     case '|': 
         st->playerAtk += 5; 
-        addItem(st, 2); 
+        st->inv[st->len]=items[1]; 
+        st->len++; 
         break;
-    case 'd': 
+    case 'D':  
+        if (exists(items[3], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[3];
+        st->len++;
+        } 
+        break;
+    case 'I': 
+        if (exists(items[4], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[4];
+        st->len++;
+        } 
+        break;
+    case 'F': 
         st->playerDef += 2; 
-        addItem(st, 3);
-        break;
-    case 'i': 
-        addItem(st, 4);  
-        break;
-    case 'f': 
-        addItem(st, 5);
+        if (exists(items[5], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[5];
+        st->len++;
+        }  
         break;
     case '*': 
-        addItem(st, 6);  
+        st->inv[st->len]=items[6]; 
+        st->len++; 
         break;
-    case 'G': 
-        addItem(st, 7); 
+    case '#': 
+        if (exists(items[7], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[7];
+        st->len++;
+        } 
+        break;
+    case '%':
+        st->playerAtk += 3; 
+        st->inv[st->len]=items[2]; 
+        st->len++; 
         break;
     }
 }
 
-void inventory(int i,int row,int col) {  // Faz print dos items no inventario
-    
-    switch(i) {
-    case 0: 
-        break;
-    case 1: 
-        mvprintw(row, col, "Faca  | "); 
-        break;
-    case 2: 
-        mvprintw(row, col, "Espada| "); 
-        break;
-    case 3: 
-        mvprintw(row, col, "BB D  | "); 
-        break;
-    case 4: 
-        mvprintw(row, col, "BB I  | "); 
-        break;
-    case 5: 
-        mvprintw(row, col, "Flash | "); 
-        break;
-    case 6: 
-        mvprintw(row, col, "Torch | "); 
-        break;
-    case 7: mvprintw(row, col, "BB F  | "); 
-        break;
-  }
-}
+
 
 void itemPickUp(STATE *st, int i) {
     
@@ -663,7 +662,7 @@ void itemPickUp(STATE *st, int i) {
 void gerarMundo(int templateRows, int templateCols) {
     
     int i;
-    reset_map(templateRows, templateCols);
+
     generate_map(templateRows, templateCols);
     for (i=0; i < N_MAXIMO_ITEMS; i++) {  // cria um certo número de items
     gerar_Random_item(templateRows, templateCols); // funções para adicionar itens

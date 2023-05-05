@@ -42,7 +42,7 @@ typedef struct STATE {
     int playerHp;
     int playerAtk;
     int playerDef;
-    int inv[1000];
+    Item inv[1000];
     int len;
 } STATE;
 

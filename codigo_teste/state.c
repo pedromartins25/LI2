@@ -24,7 +24,7 @@ void do_movement_action(STATE *st, int dx, int dy) {
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
     
     int key = getch();
-    int col=5, row=rows+5;
+    int col=5;
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
@@ -186,7 +186,12 @@ void printInventory(Item *inv, int len) {
 
     // Imprime cada item na janela
     for (int i = 0; i < len; i++) {
-        mvwprintw(inv_window, i + 3, 2, inv[i].name);
+       if (inv[i].quantity == 0) {
+        mvwprintw(inv_window, i + 3, 2,"%s", inv[i].name);
+       }
+       else {
+        mvwprintw(inv_window, i + 3, 2, "%s %d", inv[i].name, inv[i].quantity);
+       }
     }
 
     // Atualiza a janela na tela

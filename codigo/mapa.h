@@ -15,11 +15,6 @@
 
 typedef struct STATE STATE;
 
-typedef struct {
-    int lin, cols;
-    char symbol;
-} Item;
-
 
 void gerarMundo(int templateRows, int templateCols);
 

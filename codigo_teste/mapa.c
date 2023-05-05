@@ -237,6 +237,16 @@ void generate_template(int templateRows, int templateCols, int templateMap[templ
 }
 }
 
+void reset_map(int templateRows,int templateCols) {
+ for (int i = 0; i <= templateRows; i++) {
+  for (int j = 0; j <= templateCols; j++) {
+    attron(COLOR_PAIR(1));
+    mvaddch(i,j,' ');
+    attroff(COLOR_PAIR(1));
+  }
+ }
+}
+
   // Cria e desenhas o mapa
 void generate_map(int templateRows, int templateCols) {
     
@@ -316,6 +326,13 @@ if (c=='H') {  // modifica as paredes iluminadas
     attron(COLOR_PAIR(5));
     mvaddch(j,i,'+');
     attroff(COLOR_PAIR(5)); 
+}
+else {
+ if(c=='!'||c=='|'||c=='d'||c=='i'||c=='f'||c=='*'||c=='G') {
+    attron(COLOR_PAIR(4));
+    mvaddch(j,i,c);
+    attroff(COLOR_PAIR(4));
+   }
 }
 }
 }
@@ -425,6 +442,7 @@ if (d==4) {  // no caso de o player ter movido da parede direita
   }
 }
 
+
   // Verifica se é possivel o player ir de uma parede do mapa para a oposta e se sim move o player
 void endmap(STATE *st, int i, int rows, int cols) {
     
@@ -508,11 +526,11 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
 Item items[8] = {{"Faca", 1, 2, '!',1,0},
                  {"Espada", 3, 4, '|',2,0},
                  {"Clava", 5, 6, '%',3,0},
-                 {"Bomba Defensiva", 7,8, 'D',4,0},
-                 {"Bomba Incendiária", 9, 10, 'I',5,0},
-                 {"Flashbang", 11, 12, 'F', 6,0},
+                 {"Bomba Defensiva", 7,8, 'D',4,1},
+                 {"Bomba Incendiária", 9, 10, 'I',5,1},
+                 {"Flashbang", 11, 12, 'F', 6,1},
                  {"Nightstick", 13, 14, '*', 7,0},
-                 {"Bomba de fumo", 15,16, '#', 8,0}
+                 {"Bomba de fumo", 15,16, '#', 8,1}
              };
 
 
@@ -537,38 +555,78 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
        refresh();
 }
 
+int typecheck(int t, int it) {
+ if (t == it) return 1;
+ return 0;
+}
+
+int exists(Item it, int len, Item inv[len]) {
+int i;
+ for (i=0; i<len; i++) {
+  if (typecheck(inv[i].type, it.type)) {
+   return 1;
+  }
+ }
+ return 0;
+}
+
 void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
     
     switch(c) {
     case '!': 
         st->playerAtk += 2; 
-        st->inv[st->len]=1; 
+        st->inv[st->len]=items[0]; 
         st->len++; 
         break;
     case '|': 
         st->playerAtk += 5; 
-        st->inv[st->len]=2; 
+        st->inv[st->len]=items[1]; 
         st->len++; 
         break;
-    case 'd': 
-        st->playerDef += 2; 
-        st->inv[st->len]=3; 
-        st->len++; 
-        break;
-    case 'i': 
-        st->inv[st->len]=4; 
+    case 'D':  
+        if (exists(items[3], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[3];
         st->len++;
+        } 
         break;
-    case 'f': 
-        st->inv[st->len]=5; 
-        st->len++; 
+    case 'I': 
+        if (exists(items[4], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[4];
+        st->len++;
+        } 
+        break;
+    case 'F': 
+        st->playerDef += 2; 
+        if (exists(items[5], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[5];
+        st->len++;
+        }  
         break;
     case '*': 
-        st->inv[st->len]=6; 
+        st->inv[st->len]=items[6]; 
         st->len++; 
         break;
-    case 'G': 
-        st->inv[st->len]=7; 
+    case '#': 
+        if (exists(items[7], st->len, st->inv)) {
+        st->inv[st->len].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[7];
+        st->len++;
+        } 
+        break;
+    case '%':
+        st->playerAtk += 3; 
+        st->inv[st->len]=items[2]; 
         st->len++; 
         break;
     }

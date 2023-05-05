@@ -8,6 +8,8 @@
 #include "state.h"
 #include "mapa.h"
 
+
+
 void do_movement_action(STATE *st, int dx, int dy) {
 
     int new_x = st->playerX + dx;
@@ -22,7 +24,7 @@ void do_movement_action(STATE *st, int dx, int dy) {
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
     
     int key = getch();
-    int col=5, row=rows+5;
+    int col=5;
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
@@ -150,22 +152,12 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
             mvaddch(mobs[i].x, mobs[i].y, 'M');
         }
     }
-    mvprintw(row, col, "Inventory: ");  // desenha o inventario
+    //mvprintw(row, col, "Inventory: ");  // desenha o inventario
     col +=11;
-    Inv temp = st->inv;
-    for (int i = 0; i<st->len; i++) {
-        if (col==cols-8) {
-            row += 1; 
-            col = 5;
-        }
-        if (i == 1) col -= 8;
-            inventory((st->inv).item, row, col);
-            st->inv=*(st->inv.prox);
-            col += 8;
-    }
-    inventory((st->inv).item, row, col);
-    st->inv = temp;
+    printInventory(st->inv, 20);
 }
+
+
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {
     wclear(stats_window); // limpa a janela antes de atualizar
@@ -178,5 +170,39 @@ void update_stats_window(WINDOW *stats_window, STATE *st) {
     wattroff(stats_window, COLOR_PAIR(STATS));
 
     wrefresh(stats_window); // atualiza a janela na tela
-} 
-   
+}
+
+void printInventory(Item *inv, int len) {
+    WINDOW *inv_window;
+
+    // Cria a janela do inventário
+    inv_window = newwin(INV_WINDOW_HEIGHT, INV_WINDOW_WIDTH, INV_WINDOW_Y, INV_WINDOW_X);
+
+    // Desenha a borda da janela
+    box(inv_window, 0, 0);
+
+    // Imprime o título
+    mvwprintw(inv_window, 1, 2, "Inventário:");
+
+    // Imprime cada item na janela
+    for (int i = 0; i < len; i++) {
+       if (inv[i].quantity == 0) {
+        mvwprintw(inv_window, i + 3, 2,"%s", inv[i].name);
+       }
+       else {
+        mvwprintw(inv_window, i + 3, 2, "%s %d", inv[i].name, inv[i].quantity);
+       }
+    }
+
+    // Atualiza a janela na tela
+    wrefresh(inv_window);
+
+    // Limpa a janela
+    delwin(inv_window);
+}
+
+void addItem(Item *inv, int *len, Item newItem) {
+    // Adiciona o novo item na próxima posição vazia do inventário
+    inv[*len] = newItem;
+    (*len)++;
+}
