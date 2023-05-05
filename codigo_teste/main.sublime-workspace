@@ -1,0 +1,364 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"COLO",
+				"COLOR_WHITE"
+			],
+			[
+				"g",
+				"gerar_Random_item"
+			],
+			[
+				"COLOR",
+				"COLOR_RED"
+			],
+			[
+				"COL",
+				"COLOR_BLACK"
+			],
+			[
+				"stats_",
+				"stats_height"
+			],
+			[
+				"n",
+				"numVogaisRemovidas"
+			],
+			[
+				"login_b",
+				"login_button"
+			],
+			[
+				"ass",
+				"assert.h"
+			],
+			[
+				"nome",
+				"nomeVilao"
+			],
+			[
+				"nom",
+				"nomeDisfarcado"
+			],
+			[
+				"st",
+				"str2"
+			],
+			[
+				"l",
+				"lengthStr2"
+			],
+			[
+				"le",
+				"lengthStr2"
+			],
+			[
+				"leng",
+				"lengthStr1"
+			],
+			[
+				"mu",
+				"multInt2"
+			],
+			[
+				"mul",
+				"multiInt2"
+			],
+			[
+				"ge",
+				"getDrivers"
+			],
+			[
+				"init",
+				"initRide"
+			],
+			[
+				"ini",
+				"inithDrivers"
+			],
+			[
+				"N",
+				"NULL"
+			],
+			[
+				"parse",
+				"parseUsers"
+			],
+			[
+				"pars",
+				"parseUsers"
+			],
+			[
+				"pa",
+				"parseDrives"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 178.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/pjfm/Desktop/li2_default/codigo/main.c",
+		"/home/pjfm/Desktop/li2_v2/codigo/state.c",
+		"/home/pjfm/Desktop/li2_v2/codigo/main.c",
+		"/home/pjfm/li2/codigo/notas",
+		"/home/pjfm/li2/codigo/state.h",
+		"/home/pjfm/li2/codigo/README.md",
+		"/home/pjfm/li2/codigo/mapa.h",
+		"/home/pjfm/li2/codigo/mapa.c",
+		"/home/pjfm/li2/codigo/Makefile",
+		"/home/pjfm/li2/codigo/state.c",
+		"/home/pjfm/li2/codigo/main.c",
+		"/home/pjfm/li2/codigo/main.o",
+		"/home/pjfm/Desktop/poo",
+		"/home/pjfm/li2/codigo/mapa.o",
+		"/home/pjfm/Downloads/codigo/Makefile",
+		"/home/pjfm/Downloads/codigo/main.c",
+		"/home/pjfm/Downloads/codigo/mapa.c",
+		"/home/pjfm/Downloads/codigo/mapa.h",
+		"/home/pjfm/Downloads/codigo/state.c",
+		"/home/pjfm/Downloads/codigo/state.h",
+		"/home/pjfm/Downloads/codigo/notas",
+		"/home/pjfm/Downloads/codigo/README.md",
+		"/home/pjfm/Desktop/PI/teste3.c",
+		"/home/pjfm/Desktop/PI/teste4.c",
+		"/home/pjfm/Desktop/PI/ficha3.c",
+		"/home/pjfm/Desktop/PI/ficha2.c",
+		"/home/pjfm/Desktop/botcompras.py",
+		"/home/pjfm/Desktop/testeBOT.py",
+		"/home/pjfm/Desktop/testeBOTv2.py",
+		"/home/pjfm/Desktop/testescript.py",
+		"/home/pjfm/Desktop/botcomprasvs2.py",
+		"/home/pjfm/Desktop/PI/12slides.c",
+		"/home/pjfm/Desktop/PI/STRINGSteste.c",
+		"/home/pjfm/Desktop/PI/apontadoresTeste2.c",
+		"/home/pjfm/Desktop/LI2/entrada.txt",
+		"/home/pjfm/Desktop/PI/apontadoresTeste.c",
+		"/home/pjfm/Desktop/LI2/probAsem6.c",
+		"/home/pjfm/Desktop/LI2/saida.txt",
+		"/home/pjfm/Desktop/LI2/probCsem6.c",
+		"/home/pjfm/Desktop/LI2/testeProbBSem5.c",
+		"/home/pjfm/Desktop/LI2/testeSem6.c",
+		"/home/pjfm/Desktop/compararFicheiros.c",
+		"/home/pjfm/Desktop/saida.txt",
+		"/home/pjfm/Desktop/entrada.txt",
+		"/home/pjfm/Desktop/LI2/probBsem6.c",
+		"/home/pjfm/Desktop/LI2/testeAsem6.c",
+		"/home/pjfm/Desktop/PI/50q.c",
+		"/home/pjfm/Downloads/50q2.c",
+		"/home/pjfm/Desktop/PI/teste.c",
+		"/home/pjfm/Desktop/PI/teste2.c",
+		"/home/pjfm/Desktop/LI2/testeProbBSem5",
+		"/home/pjfm/Desktop/LI2/makefile",
+		"/home/pjfm/Desktop/LI2/input1",
+		"/home/pjfm/Desktop/LI2/probCsem5.c",
+		"/home/pjfm/Desktop/LI2/probAsem5.c",
+		"/home/pjfm/Desktop/LI2/probCsem3.c",
+		"/home/pjfm/Desktop/LI2/probBsem3.c",
+		"/home/pjfm/Desktop/LI2/probBsem5.c",
+		"/home/pjfm/Desktop/LI2/probAsem2.c",
+		"/home/pjfm/Desktop/LI2/probCsem2.c",
+		"/home/pjfm/Desktop/LI2/testeProbCsem3.c",
+		"/home/pjfm/Desktop/LI2/probBsem2.c",
+		"/home/pjfm/Desktop/LI2/probA.c",
+		"/home/pjfm/Desktop/LI2/probC.c",
+		"/home/pjfm/Desktop/LI2/probB.c",
+		"/home/pjfm/Desktop/probC.c",
+		"/home/pjfm/Desktop/probBsem2.c",
+		"/home/pjfm/Desktop/probAsem2.c",
+		"/home/pjfm/Desktop/probCsem2.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/50questoes.hs",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/catalogo.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/drivers.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/main.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/parseDrives.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/parseRides.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/parseUsers.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/querries.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/rides.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/users.c",
+		"/home/pjfm/Desktop/ficha1.c",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/querries.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/parseUsers.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/parseRides.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/parseDrives.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/main.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/drivers.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/users.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/includes/rides.h",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/Makefile",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/obj/main.o",
+		"/home/pjfm/Desktop/grupo-90/trabalho-pratico/src/catalogo.h",
+		"/home/pjfm/Desktop/grupo-90 (copy)/trabalho-pratico/Makefile",
+		"/home/pjfm/Desktop/grupo-90 (copy)/trabalho-pratico/src/main.c",
+		"/home/pjfm/Desktop/grupo-90 (copy)/trabalho-pratico/includes/main.h",
+		"/home/pjfm/Desktop/grupo-90 (copy)/Makefile",
+		"/home/pjfm/Desktop/grupo-90/includes/parseRides.h",
+		"/home/pjfm/Desktop/grupo-90/src/rides.c",
+		"/home/pjfm/Desktop/grupo-90/src/parseRides.c",
+		"/home/pjfm/Desktop/grupo-90 (copy)/Makefilebckp",
+		"/home/pjfm/Desktop/grupo-90/Makefile",
+		"/home/pjfm/Desktop/grupo-90/includes/parseUsers.h",
+		"/home/pjfm/Desktop/grupo-90/includes/parseDrives.h",
+		"/home/pjfm/Desktop/grupo-90/src/parseUsers.c",
+		"/home/pjfm/Desktop/grupo-90/includes/drivers.h",
+		"/home/pjfm/Desktop/grupo-90/src/main.c",
+		"/home/pjfm/Desktop/grupo-90/src/parseDrives.c"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 35.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "main.sublime-project",
+	"replace":
+	{
+		"height": 66.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
