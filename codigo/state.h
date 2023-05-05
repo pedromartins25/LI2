@@ -19,13 +19,18 @@ typedef struct {
     int def;
 } MOB;
 
+typedef struct Inventario {
+    int item;
+    struct Inventario * prox;
+} Inv;
+
 typedef struct STATE {
     int playerX;
     int playerY;
     int playerHp;
     int playerAtk;
     int playerDef;
-    int inv[1000];
+    Inv inv;
     int len;
 } STATE;
 

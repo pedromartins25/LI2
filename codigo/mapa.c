@@ -306,6 +306,16 @@ for (i=0; i<x;i++) {
 }
 }
 
+void reset_map(int templateRows,int templateCols) {
+ for (int i = 0; i <= templateRows; i++) {
+  for (int j = 0; j <= templateCols; j++) {
+    attron(COLOR_PAIR(1));
+    mvaddch(i,j,' ');
+    attroff(COLOR_PAIR(1));
+  }
+ }
+}
+
   // Verifica se a entidade pode fazer um certo movimento
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
@@ -327,6 +337,13 @@ if (c=='H') {  // modifica as paredes iluminadas
     attron(COLOR_PAIR(5));
     mvaddch(j,i,'+');
     attroff(COLOR_PAIR(5)); 
+}
+else {
+ if(c=='!'||c=='|'||c=='d'||c=='i'||c=='f'||c=='*'||c=='G') {
+    attron(COLOR_PAIR(4));
+    mvaddch(j,i,c);
+    attroff(COLOR_PAIR(4));
+   }
 }
 }
 }
@@ -489,6 +506,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
         if (c == 'S') {
+            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
         }
@@ -496,6 +514,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 2) {  // no caso de andar para baixo
         c = mvinch(x+1,y);
         if (c == 'S') {
+            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
         }
@@ -503,6 +522,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 3) {  // no caso de andar para a esquerda
         c = mvinch(x,y-1);
         if (c == 'S') {
+            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
         }
@@ -510,6 +530,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
     if (i == 4) {  // no caso de andar para a direita
         c = mvinch(x,y+1);
         if (c == 'S') {
+            srandom(time(NULL));
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
         }
@@ -537,39 +558,51 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
        refresh();
 }
 
+void addItem(STATE *st, int i) {
+ if (st->len == 0) {
+  st->inv.item = i;
+  st->inv.prox =  malloc(sizeof(struct Inventario));
+ }
+ else {
+    Inv *temp = st->inv.prox;
+    Inv *new_inv = malloc(sizeof(Inv));
+    new_inv->item = i;
+    new_inv->prox = NULL;
+     while (temp->prox != NULL) {
+       temp = temp->prox;
+    }
+     temp->prox = new_inv;
+    }
+   
+    st->len++;
+}
+
 void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
     
     switch(c) {
     case '!': 
         st->playerAtk += 2; 
-        st->inv[st->len]=1; 
-        st->len++; 
+        addItem(st, 1);
         break;
     case '|': 
         st->playerAtk += 5; 
-        st->inv[st->len]=2; 
-        st->len++; 
+        addItem(st, 2); 
         break;
     case 'd': 
         st->playerDef += 2; 
-        st->inv[st->len]=3; 
-        st->len++; 
+        addItem(st, 3);
         break;
     case 'i': 
-        st->inv[st->len]=4; 
-        st->len++;
+        addItem(st, 4);  
         break;
     case 'f': 
-        st->inv[st->len]=5; 
-        st->len++; 
+        addItem(st, 5);
         break;
     case '*': 
-        st->inv[st->len]=6; 
-        st->len++; 
+        addItem(st, 6);  
         break;
     case 'G': 
-        st->inv[st->len]=7; 
-        st->len++; 
+        addItem(st, 7); 
         break;
     }
 }
@@ -630,7 +663,7 @@ void itemPickUp(STATE *st, int i) {
 void gerarMundo(int templateRows, int templateCols) {
     
     int i;
-
+    reset_map(templateRows, templateCols);
     generate_map(templateRows, templateCols);
     for (i=0; i < N_MAXIMO_ITEMS; i++) {  // cria um certo número de items
     gerar_Random_item(templateRows, templateCols); // funções para adicionar itens

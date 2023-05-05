@@ -152,15 +152,19 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
     }
     mvprintw(row, col, "Inventory: ");  // desenha o inventario
     col +=11;
-    for (int i = 0; i <= st->len; i++) {
+    Inv temp = st->inv;
+    for (int i = 0; i<st->len; i++) {
         if (col==cols-8) {
-            row += 1; col = 5;
+            row += 1; 
+            col = 5;
         }
-        if (i < st->len) {
-            inventory(st->inv[i], row, col);
-            col+=8;
-        }
+        if (i == 1) col -= 8;
+            inventory((st->inv).item, row, col);
+            st->inv=*(st->inv.prox);
+            col += 8;
     }
+    inventory((st->inv).item, row, col);
+    st->inv = temp;
 }
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {

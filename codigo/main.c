@@ -8,7 +8,7 @@
 #include "mapa.h"
 
 int main() {
-	STATE st = {5,5,100,10,10,{0},0};
+	STATE st = {5,5,100,10,10,{.item=0, .prox=NULL},0};
 
 	MOB mob = {15,15,10,10,10};
 	int num_mobs = 10;
