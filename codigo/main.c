@@ -8,7 +8,7 @@
 #include "mapa.h"
 
 int main() {
-	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0}},1};
+	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},3,1, 0};
 
 	MOB mob = {15,15,10,10,10};
 	int num_mobs = 10;
@@ -76,7 +76,7 @@ int main() {
 		mvaddch(st.playerX, st.playerY, '@' | A_BOLD);
 		attroff(COLOR_PAIR(17));
 		move(st.playerX, st.playerY);
-		update(&st, &mob, num_mobs, templateRows, templateCols);
+		update(&st, &mob, num_mobs, templateRows, templateCols, stats_window);
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
 	}

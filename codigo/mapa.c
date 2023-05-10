@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "state.h"
 #include "mapa.h"
@@ -328,7 +329,7 @@ if (c=='H') {  // modifica as paredes iluminadas
     attroff(COLOR_PAIR(5)); 
 }
 else {
- if(c=='!'||c=='|'||c=='d'||c=='i'||c=='f'||c=='*'||c=='G') {
+ if(c=='!'||c=='|'||c=='D'||c=='I'||c=='F'||c=='*'||c=='G'||c=='A'||c=='C') {
     attron(COLOR_PAIR(4));
     mvaddch(j,i,c);
     attroff(COLOR_PAIR(4));
@@ -498,6 +499,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
         if (c == 'S') {
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
+            srandom(time(NULL));
         }
     }
     if (i == 2) {  // no caso de andar para baixo
@@ -505,6 +507,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
         if (c == 'S') {
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
+            srandom(time(NULL));
         }
     }
     if (i == 3) {  // no caso de andar para a esquerda
@@ -512,6 +515,7 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
         if (c == 'S') {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
+            srandom(time(NULL));
         }
     }
     if (i == 4) {  // no caso de andar para a direita
@@ -519,18 +523,21 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
         if (c == 'S') {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
+            srandom(time(NULL));
         }
     }
 }
 
-Item items[8] = {{"Faca", 1, 2, '!',1,0},
-                 {"Espada", 3, 4, '|',2,0},
-                 {"Clava", 5, 6, '%',3,0},
-                 {"Bomba Defensiva", 7,8, 'D',4,1},
-                 {"Bomba Incendiária", 9, 10, 'I',5,1},
-                 {"Flashbang", 11, 12, 'F', 6,1},
-                 {"Nightstick", 13, 14, '*', 7,0},
-                 {"Bomba de fumo", 15,16, '#', 8,1}
+Item items[10] = {{"Faca", 1, 2, '!',2,1,0},
+                 {"Espada", 3, 4, '|',5,2,0},
+                 {"Clava", 5, 6, '%',3,3,0},
+                 {"Bomba Defensiva", 7,8, 'D',0, 4,1},
+                 {"Bomba Incendiária", 9, 10, 'I',0, 5,1},
+                 {"Flashbang", 11, 12, 'F',0, 6,1},
+                 {"Nightstick", 13, 14, '*',0, 7,0},
+                 {"Bomba de fumo", 15,16, '#',0, 8,1},
+                 {"Armadura", 17, 18, 'A',5,9,0},
+                 {"Colar", 19, 20, 'C',20, 10,0} 
              };
 
 
@@ -542,7 +549,7 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
     
         x = (rand() % (((templateRows)-1)+1)) + 1;
         y = (rand() % (((templateCols)-1)+1)) + 1;
-        r = rand() % 8;
+        r = rand() % 10;
 
         item = items[r];
         while (mapa_pode_andar(x, y) != 1) {
@@ -564,28 +571,64 @@ int exists(Item it, int len, Item inv[len]) {
 int i;
  for (i=0; i<len; i++) {
   if (typecheck(inv[i].type, it.type)) {
-   return 1;
+   return i;
   }
  }
  return 0;
 }
 
+Item createItem(Item i) {
+    int j;
+    double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};
+    srand(time(NULL));
+    double rn = (double) rand() / RAND_MAX;
+    double cn = 0.0;
+    for (j = 0; j < 5; j++) {
+        cn += probabilities[j];
+        if (rn <= cn) {
+            break;
+        }
+    }
+  switch (j) {
+   case 0: 
+       strcat(i.name," de ferro");
+       i.stat += 1;
+       return i;
+   case 1: 
+       strcat(i.name," de Diamante");
+       i.stat += 2;
+       return i;
+   case 2: 
+       strcat(i.name," de Mitril");
+       i.stat += 3;
+       return i;
+   case 3: 
+       strcat(i.name," Divinda");
+       i.stat += 4;
+       return i;
+   case 4: 
+       strcat(i.name," das Trevas");
+       i.stat += 5; 
+       return i;  
+  }
+  return i;
+}
+
 void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
-    
+int i=0;
     switch(c) {
     case '!': 
-        st->playerAtk += 2; 
-        st->inv[st->len]=items[0]; 
+        st->inv[st->len]=createItem(items[0]); 
         st->len++; 
         break;
     case '|': 
-        st->playerAtk += 5; 
-        st->inv[st->len]=items[1]; 
+        st->inv[st->len]=createItem(items[1]); 
         st->len++; 
         break;
     case 'D':  
-        if (exists(items[3], st->len, st->inv)) {
-        st->inv[st->len].quantity++;
+        i = exists(items[3], st->len, st->inv);
+        if (i != 0) {
+        st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[3];
@@ -593,18 +636,19 @@ void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modific
         } 
         break;
     case 'I': 
-        if (exists(items[4], st->len, st->inv)) {
-        st->inv[st->len].quantity++;
+        i = exists(items[4], st->len, st->inv);
+        if (i != 0) {
+        st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[4];
         st->len++;
         } 
         break;
-    case 'F': 
-        st->playerDef += 2; 
-        if (exists(items[5], st->len, st->inv)) {
-        st->inv[st->len].quantity++;
+    case 'F':  
+        i = exists(items[5], st->len, st->inv);
+        if (i != 0) {
+        st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[5];
@@ -612,12 +656,13 @@ void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modific
         }  
         break;
     case '*': 
-        st->inv[st->len]=items[6]; 
+        st->inv[i]=items[6]; 
         st->len++; 
         break;
     case '#': 
-        if (exists(items[7], st->len, st->inv)) {
-        st->inv[st->len].quantity++;
+        i = exists(items[7], st->len, st->inv);
+        if (i != 0) {
+        st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[7];
@@ -625,8 +670,15 @@ void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modific
         } 
         break;
     case '%':
-        st->playerAtk += 3; 
-        st->inv[st->len]=items[2]; 
+        st->inv[st->len]=createItem(items[2]);  
+        st->len++; 
+        break;
+    case 'A':  
+        st->inv[st->len]=createItem(items[8]); 
+        st->len++; 
+        break;
+    case 'C': 
+        st->inv[st->len]=createItem(items[9]); 
         st->len++; 
         break;
     }

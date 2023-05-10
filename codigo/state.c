@@ -21,14 +21,20 @@ void do_movement_action(STATE *st, int dx, int dy) {
  }
 }
 
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
+void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window) {
     
     int key = getch();
-    int col=5;
+    WINDOW *inv_window;
+    WINDOW *equip_window;
+
+    // Cria a janela do inventário
+    inv_window = newwin(rows - 2, cols/2-2, INV_WINDOW_Y, INV_WINDOW_X);
+    equip_window = newwin(rows - 2, cols/2-2, EQUIP_WINDOW_Y, cols/2); 
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
     attroff(COLOR_PAIR(2));
+    if (st->menu==0) {
     switch(key) {
         case KEY_A1:
         case '7': 
@@ -101,6 +107,14 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
             endwin();
             exit(0); 
             break;
+        case 'm':
+            printInventory(st->inv, cols/2-2, inv_window);
+            printEquip(st->equip, 3, equip_window);
+            st->menu=1;
+            mvwprintw(inv_window,3, 1, ">");
+            st->equipPos = 3;
+            wrefresh(inv_window);
+            break;
     }
 
     // atualiza o estado dos inimigos
@@ -152,9 +166,50 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols) {
             mvaddch(mobs[i].x, mobs[i].y, 'M');
         }
     }
-    //mvprintw(row, col, "Inventory: ");  // desenha o inventario
-    col +=11;
-    printInventory(st->inv, 20);
+    }
+    else {
+       switch(key) {
+        case 'q': 
+            endwin();
+            exit(0); 
+            break;
+        case KEY_UP:
+            if (st->equipPos >= 3) {
+             printInventory(st->inv, cols/2-2, inv_window);
+             printEquip(st->equip, 3, equip_window);
+             st->equipPos --;
+             mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
+             wrefresh(inv_window);
+            }
+            break;
+        case KEY_DOWN:
+            if (st->equipPos <= rows-2) {
+             printInventory(st->inv, cols/2-2, inv_window);
+             printEquip(st->equip, 3, equip_window);
+             st->equipPos ++;
+             mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
+             wrefresh(inv_window);
+            }
+            break;
+        case 'e':
+            equipItem(st);
+            printInventory(st->inv, cols/2-2, inv_window);
+            printEquip(st->equip, 3, equip_window);
+            wrefresh(equip_window);
+            mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
+            wrefresh(inv_window);
+            break;
+        case KEY_BACKSPACE:
+            wclear(inv_window);
+            wrefresh(inv_window);
+            wclear(equip_window);
+            wrefresh(equip_window);
+            refresh();
+            st->menu=0;
+            break;       
+       }
+    }
+            update_stats_window(stats_window, st);
 }
 
 
@@ -172,11 +227,58 @@ void update_stats_window(WINDOW *stats_window, STATE *st) {
     wrefresh(stats_window); // atualiza a janela na tela
 }
 
-void printInventory(Item *inv, int len) {
-    WINDOW *inv_window;
+void equipItem(STATE *st) {
+Item temp;
+  if (st->inv[st->equipPos-3].type == 1 || st->inv[st->equipPos-3].type == 2 || st->inv[st->equipPos-3].type == 3) {
+   st->playerAtk -= st->equip[0].stat;
+   temp = st->equip[0];
+   st->equip[0] = st->inv[st->equipPos-3];
+   st->playerAtk += st->equip[0].stat;
+   st->inv[st->equipPos-3] = temp;
+  }
+  if (st->inv[st->equipPos-3].type == 9) {
+   st->playerDef -= st->equip[1].stat;
+   temp = st->equip[1];
+   st->equip[1] = st->inv[st->equipPos-3];  
+   st->playerDef += st->equip[1].stat;
+   st->inv[st->equipPos-3] = temp;
+  }
+  if (st->inv[st->equipPos-3].type == 10) {
+   st->playerHp -= st->equip[2].stat;
+   temp = st->equip[2];
+   st->equip[2] = st->inv[st->equipPos-3];  
+   st->playerHp += st->equip[2].stat;
+   st->inv[st->equipPos-3] = temp;
+  }
+}
 
-    // Cria a janela do inventário
-    inv_window = newwin(INV_WINDOW_HEIGHT, INV_WINDOW_WIDTH, INV_WINDOW_Y, INV_WINDOW_X);
+void printEquip(Item *equip, int len, WINDOW *equip_window) {
+
+    // Desenha a borda da janela
+    box(equip_window, 0, 0);
+
+    // Imprime o título
+    mvwprintw(equip_window, 1, 2, "Equipamento:");
+
+    // Imprime cada item na janela
+    for (int i = 0; i < len; i++) {
+       if (i==0) {
+        mvwprintw(equip_window, i + 3, 2,"%s%s","Arma: ", equip[i].name);
+       }
+       if (i==1) {
+        mvwprintw(equip_window, i + 3, 2,"%s%s","Armadura: ", equip[i].name);
+       }
+       if (i==2) {
+        mvwprintw(equip_window, i + 3, 2,"%s%s","Colar: ", equip[i].name);
+       }
+    }
+
+    // Atualiza a janela na tela
+    wrefresh(equip_window);
+
+}
+
+void printInventory(Item *inv, int len, WINDOW *inv_window) {
 
     // Desenha a borda da janela
     box(inv_window, 0, 0);
@@ -197,8 +299,6 @@ void printInventory(Item *inv, int len) {
     // Atualiza a janela na tela
     wrefresh(inv_window);
 
-    // Limpa a janela
-    delwin(inv_window);
 }
 
 void addItem(Item *inv, int *len, Item newItem) {

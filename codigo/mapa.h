@@ -32,5 +32,6 @@ void itemPickUp(STATE *st, int i);
 
 void inventory(int i,int row,int col);
 
+void lightaux(char c, int j, int i);
 
 #endif
