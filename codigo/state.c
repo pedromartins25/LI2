@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "state.h"
 #include "mapa.h"
@@ -21,15 +22,16 @@ void do_movement_action(STATE *st, int dx, int dy) {
  }
 }
 
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window) {
+void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window){
+
     
     int key = getch();
     WINDOW *inv_window;
     WINDOW *equip_window;
 
     // Cria a janela do inventário
-    inv_window = newwin(rows - 2, cols/2-2, INV_WINDOW_Y, INV_WINDOW_X);
-    equip_window = newwin(rows - 2, cols/2-2, EQUIP_WINDOW_Y, cols/2); 
+    inv_window = newwin(rows - 30, cols - 150, 31, 57);
+    equip_window = newwin(rows - 30, cols - 150, EQUIP_WINDOW_Y, cols/2); 
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
@@ -108,7 +110,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             exit(0); 
             break;
         case 'm':
-            printInventory(st->inv, cols/2-2, inv_window);
+            printInventory(st->inv, cols - 150, inv_window);
             printEquip(st->equip, 3, equip_window);
             st->menu=1;
             mvwprintw(inv_window,3, 1, ">");
@@ -198,6 +200,9 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             wrefresh(equip_window);
             mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
             wrefresh(inv_window);
+            // Adicione uma mensagem à janela de mensagens
+            const char* message = "Item equipado!";
+            add_message(msg_window, message);
             break;
         case KEY_BACKSPACE:
             wclear(inv_window);
@@ -306,3 +311,45 @@ void addItem(Item *inv, int *len, Item newItem) {
     inv[*len] = newItem;
     (*len)++;
 }
+
+void init_message_window(MessageWindow* msg_window) {
+    msg_window->num_messages = 0;
+}
+
+void add_message(MessageWindow* msg_window, const char* message) {
+    if (msg_window->num_messages < MAX_MESSAGES) {
+        // Move todas as mensagens existentes uma posição para cima
+        for (int i = msg_window->num_messages - 1; i > 0; i--) {
+            strcpy(msg_window->messages[i], msg_window->messages[i - 1]);
+        }
+
+        // Adiciona a nova mensagem na posição 0
+        strcpy(msg_window->messages[0], message);
+
+        // Incrementa o número de mensagens, mas garante que não exceda o limite
+        msg_window->num_messages++;
+        if (msg_window->num_messages > MAX_MESSAGES) {
+            msg_window->num_messages = MAX_MESSAGES;
+        }
+    }
+}
+
+
+void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col) {
+    box(window, 0, 0);
+
+    int row = start_row + 1;
+    int col = start_col + 1;
+
+    for (int i = 0; i < msg_window->num_messages; i++) {
+        mvwprintw(window, row, col, msg_window->messages[i]);
+        row++;
+    }
+
+    wrefresh(window);
+}
+
+
+
+
+

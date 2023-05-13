@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <time.h>
+#include <string.h>
 
 #include "state.h"
 #include "mapa.h"
@@ -59,14 +60,13 @@ int main() {
     int stats_x = ncols - stats_width;
     WINDOW *stats_window = newwin(stats_height, stats_width, stats_y, stats_x);
 
-	/**
-	 * Este código está muito mal escrito!
-	 * Deveria existir uma função chamada draw_player!
-	 *
-	 * Se estamos a desenhar uma luz à volta do jogador
-	 * deveria existir uma função chamada draw_light!
-	 *
-	 */
+
+
+    // cria a janela de mensagens
+    WINDOW* msg_wnd = newwin(nrows - 32, ncols - 150, 31, 5);  // Define as dimensões da janela de mensagens
+    MessageWindow msg_window;
+    init_message_window(&msg_window);
+
 	while(1) {
 		move(nrows - 1, 0);
 		attron(COLOR_PAIR(15));
@@ -76,15 +76,23 @@ int main() {
 		mvaddch(st.playerX, st.playerY, '@' | A_BOLD);
 		attroff(COLOR_PAIR(17));
 		move(st.playerX, st.playerY);
-		update(&st, &mob, num_mobs, templateRows, templateCols, stats_window);
+		update(&st, &mob, num_mobs, templateRows, templateCols, stats_window, &msg_window);
+
+        draw_message_window(msg_wnd, &msg_window, 0, 0);
+
+
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
 	}
     // limpa a janela de stats e encerra o ncurses
      delwin(stats_window);
+     delwin(msg_wnd);
      endwin();
    }
-   else{endwin(); printf("%s\n","Aumente a janela");}
+   else {
+   	endwin(); 
+   	printf("%s\n","Aumente a janela");
+   }
 
    return 0;
 }
