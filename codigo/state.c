@@ -22,16 +22,15 @@ void do_movement_action(STATE *st, int dx, int dy) {
  }
 }
 
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window){
+void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
 
-    
     int key = getch();
     WINDOW *inv_window;
     WINDOW *equip_window;
 
     // Cria a janela do inventário
-    inv_window = newwin(rows - 30, cols - 150, 31, 57);
-    equip_window = newwin(rows - 30, cols - 150, EQUIP_WINDOW_Y, cols/2); 
+    inv_window = newwin(10, ncols/3-2, rows+1, 5+(ncols/3-2));
+    equip_window = newwin(10, ncols/3-2, rows+1, 5+2*(ncols/3-2)); 
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
@@ -109,8 +108,8 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endwin();
             exit(0); 
             break;
-        case 'm':
-            printInventory(st->inv, cols - 150, inv_window);
+        case 'm':  // abre o inventario e pausa o jogo
+            printInventory(st->inv, inv_window, st->n, st->m);
             printEquip(st->equip, 3, equip_window);
             st->menu=1;
             mvwprintw(inv_window,3, 1, ">");
@@ -171,40 +170,53 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
     }
     else {
        switch(key) {
-        case 'q': 
+        case 'q':  // fecha o jogo
             endwin();
             exit(0); 
             break;
-        case KEY_UP:
+        case KEY_UP:  // faz scroll para cima do inventario
             if (st->equipPos >= 3) {
-             printInventory(st->inv, cols/2-2, inv_window);
+             if (st->n > 0) { st->n--; st->m--;
+             printInventory(st->inv, inv_window, st->n, st->m);
              printEquip(st->equip, 3, equip_window);
              st->equipPos --;
-             mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
+             mvwprintw(inv_window,3, 1, "%c", '>');
              wrefresh(inv_window);
+             }
             }
             break;
-        case KEY_DOWN:
+        case KEY_DOWN:  // faz scroll para baixo do inventario
             if (st->equipPos <= rows-2) {
-             printInventory(st->inv, cols/2-2, inv_window);
+             if (st->n < st->len) { st->n++; st->m++;
+             printInventory(st->inv, inv_window, st->n, st->m);
              printEquip(st->equip, 3, equip_window);
              st->equipPos ++;
-             mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
+             mvwprintw(inv_window,3, 1, "%c", '>');
+             wrefresh(inv_window);
+             }
+            }
+            break;
+        case 'e':  // equipa um item
+            equipItem(st, msg_window);
+            printInventory(st->inv, inv_window, st->n, st->m);
+            printEquip(st->equip, 3, equip_window);
+            wrefresh(equip_window);
+            mvwprintw(inv_window,3, 1, "%c", '>');
+            wrefresh(inv_window);
+            break;
+        case 'd':  // apaga um item
+            dropItem(st, msg_window);
+            if (st->n > 0) { st->n--; st->m--;
+             st->equipPos--;
+             printInventory(st->inv, inv_window, st->n, st->m);
+             printInventory(st->inv, inv_window, st->n, st->m);
+             printEquip(st->equip, 3, equip_window);
+             wrefresh(equip_window);
+             mvwprintw(inv_window,3, 1, "%c", '>');
              wrefresh(inv_window);
             }
             break;
-        case 'e':
-            equipItem(st);
-            printInventory(st->inv, cols/2-2, inv_window);
-            printEquip(st->equip, 3, equip_window);
-            wrefresh(equip_window);
-            mvwprintw(inv_window,st->equipPos, 1, "%c", '>');
-            wrefresh(inv_window);
-            // Adicione uma mensagem à janela de mensagens
-            const char* message = "Item equipado!";
-            add_message(msg_window, message);
-            break;
-        case KEY_BACKSPACE:
+        case KEY_BACKSPACE:  // fecha a janela do inventario
             wclear(inv_window);
             wrefresh(inv_window);
             wclear(equip_window);
@@ -232,28 +244,40 @@ void update_stats_window(WINDOW *stats_window, STATE *st) {
     wrefresh(stats_window); // atualiza a janela na tela
 }
 
-void equipItem(STATE *st) {
+
+// Modifica o item que está equipado e atualiza os stats
+void equipItem(STATE *st, MessageWindow* msg_window) {
 Item temp;
-  if (st->inv[st->equipPos-3].type == 1 || st->inv[st->equipPos-3].type == 2 || st->inv[st->equipPos-3].type == 3) {
-   st->playerAtk -= st->equip[0].stat;
+  if (st->inv[st->equipPos-3].type == 1 || st->inv[st->equipPos-3].type == 2 || st->inv[st->equipPos-3].type == 3) { // no caso de ser uma arma
+   st->playerAtk -= st->equip[0].stat; // atualiza os stats
    temp = st->equip[0];
    st->equip[0] = st->inv[st->equipPos-3];
    st->playerAtk += st->equip[0].stat;
    st->inv[st->equipPos-3] = temp;
+    // Adicione uma mensagem à janela de mensagens
+   const char* message = "Item equipado!";
+   add_message(msg_window, message);
+   
   }
-  if (st->inv[st->equipPos-3].type == 9) {
+  if (st->inv[st->equipPos-3].type == 9) { // no caso de ser uma armadura
    st->playerDef -= st->equip[1].stat;
    temp = st->equip[1];
    st->equip[1] = st->inv[st->equipPos-3];  
    st->playerDef += st->equip[1].stat;
    st->inv[st->equipPos-3] = temp;
+    // Adicione uma mensagem à janela de mensagens
+    const char* message = "Item equipado!";
+    add_message(msg_window, message);
   }
-  if (st->inv[st->equipPos-3].type == 10) {
+  if (st->inv[st->equipPos-3].type == 10) { // no caso de ser um colar
    st->playerHp -= st->equip[2].stat;
    temp = st->equip[2];
    st->equip[2] = st->inv[st->equipPos-3];  
    st->playerHp += st->equip[2].stat;
    st->inv[st->equipPos-3] = temp;
+   // Adicione uma mensagem à janela de mensagens
+   const char* message = "Item equipado!";
+   add_message(msg_window, message);
   }
 }
 
@@ -263,7 +287,7 @@ void printEquip(Item *equip, int len, WINDOW *equip_window) {
     box(equip_window, 0, 0);
 
     // Imprime o título
-    mvwprintw(equip_window, 1, 2, "Equipamento:");
+    mvwprintw(equip_window, 1, 2,"%s", "Equipamento:");
 
     // Imprime cada item na janela
     for (int i = 0; i < len; i++) {
@@ -283,8 +307,8 @@ void printEquip(Item *equip, int len, WINDOW *equip_window) {
 
 }
 
-void printInventory(Item *inv, int len, WINDOW *inv_window) {
-
+void printInventory(Item *inv, WINDOW *inv_window, int n, int m) {
+int j=3;
     // Desenha a borda da janela
     box(inv_window, 0, 0);
 
@@ -292,12 +316,14 @@ void printInventory(Item *inv, int len, WINDOW *inv_window) {
     mvwprintw(inv_window, 1, 2, "Inventário:");
 
     // Imprime cada item na janela
-    for (int i = 0; i < len; i++) {
+    for (int i = n; i < m; i++) {
        if (inv[i].quantity == 0) {
-        mvwprintw(inv_window, i + 3, 2,"%s", inv[i].name);
+        mvwprintw(inv_window, j, 2,"%s", inv[i].name);
+        j++;
        }
        else {
-        mvwprintw(inv_window, i + 3, 2, "%s %d", inv[i].name, inv[i].quantity);
+        mvwprintw(inv_window, j, 2, "%s %d", inv[i].name, inv[i].quantity);
+        j++;
        }
     }
 
@@ -342,14 +368,31 @@ void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_ro
     int col = start_col + 1;
 
     for (int i = 0; i < msg_window->num_messages; i++) {
-        mvwprintw(window, row, col, msg_window->messages[i]);
+        mvwprintw(window, row, col, "%s", msg_window->messages[i]);
         row++;
     }
 
     wrefresh(window);
 }
 
-
+// Função que apaga um item do inventário
+void dropItem(STATE *st, MessageWindow* msg_window) {
+int i;
+ for (i=st->equipPos; i<st->len; i++) { // apaga o item na posição selecionada
+  st->inv[i] = st->inv[i+1];
+ }
+    strcpy(st->inv[st->len - 1].name, ""); // apaga o item extra final que fica depois de mover o array
+    st->inv[st->len - 1].lin = 0;
+    st->inv[st->len - 1].cols = 0;
+    st->inv[st->len - 1].symbol = '\0';
+    st->inv[st->len - 1].stat = 0;
+    st->inv[st->len - 1].type = 0;
+    st->inv[st->len - 1].quantity = 0;
+    st->len--;
+   // Adicione uma mensagem à janela de mensagens
+   const char* message = "Item Apagado!";
+   add_message(msg_window, message);
+}
 
 
 

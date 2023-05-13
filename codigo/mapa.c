@@ -238,6 +238,7 @@ void generate_template(int templateRows, int templateCols, int templateMap[templ
 }
 }
 
+// apaga o mada no ecrã quando um novo é criado
 void reset_map(int templateRows,int templateCols) {
  for (int i = 0; i <= templateRows; i++) {
   for (int j = 0; j <= templateCols; j++) {
@@ -562,12 +563,12 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
        refresh();
 }
 
-int typecheck(int t, int it) {
+int typecheck(int t, int it) {  // verifica se os items são do mesmo tipo
  if (t == it) return 1;
  return 0;
 }
 
-int exists(Item it, int len, Item inv[len]) {
+int exists(Item it, int len, Item inv[len]) {  // verifica se um item stackable já existe e devole a sua posição
 int i;
  for (i=0; i<len; i++) {
   if (typecheck(inv[i].type, it.type)) {
@@ -577,13 +578,13 @@ int i;
  return 0;
 }
 
-Item createItem(Item i) {
+Item createItem(Item i) {  // cria um item depois de ser apanhado, mudando o nome e stats
     int j;
-    double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};
+    double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};  // cria probabilidades para os items
     srand(time(NULL));
     double rn = (double) rand() / RAND_MAX;
     double cn = 0.0;
-    for (j = 0; j < 5; j++) {
+    for (j = 0; j < 5; j++) {  // seleciona o numero
         cn += probabilities[j];
         if (rn <= cn) {
             break;
@@ -618,7 +619,7 @@ void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modific
 int i=0;
     switch(c) {
     case '!': 
-        st->inv[st->len]=createItem(items[0]); 
+        st->inv[st->len]=createItem(items[0]); // adiciona o item ao inventário
         st->len++; 
         break;
     case '|': 
@@ -626,9 +627,9 @@ int i=0;
         st->len++; 
         break;
     case 'D':  
-        i = exists(items[3], st->len, st->inv);
-        if (i != 0) {
-        st->inv[i].quantity++;
+        i = exists(items[3], st->len, st->inv);  // devolve a posição do item
+        if (i != 0) {  // verifica se o item já existe
+        st->inv[i].quantity++;  // aumenta a quantidade do item
         }
         else {
         st->inv[st->len]=items[3];
@@ -656,7 +657,7 @@ int i=0;
         }  
         break;
     case '*': 
-        st->inv[i]=items[6]; 
+        st->inv[st->len]=items[6]; 
         st->len++; 
         break;
     case '#': 

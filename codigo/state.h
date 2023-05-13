@@ -45,6 +45,7 @@ typedef struct STATE {
     int playerDef;
     Item inv[1000];
     Item equip[3];
+    int n, m;
     int equipPos;
     int len;
     int menu;
@@ -57,14 +58,15 @@ typedef struct {
 
 
 void do_movement_action(STATE *st, int dx, int dy);
-void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window);
+void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols);
 void update_stats_window(WINDOW *stats_window, STATE *st);
-void printInventory(Item *inv, int len,  WINDOW *inv_window);
+void printInventory(Item *inv,  WINDOW *inv_window, int n, int m);
 void addItem(Item *inv, int *len, Item newItem);
 void printEquip(Item *equip, int len, WINDOW *equip_window);
-void equipItem(STATE *st);
+void equipItem(STATE *st, MessageWindow* msg_window);
 void init_message_window(MessageWindow* msg_window);
 void add_message(MessageWindow* msg_window, const char* message);
 void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col);
+void dropItem(STATE *st, MessageWindow* msg_window);
 
 #endif
