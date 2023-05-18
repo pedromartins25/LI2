@@ -10,18 +10,6 @@
 #include "mapa.h"
 
 
-
-void do_movement_action(STATE *st, int dx, int dy) {
-
-    int new_x = st->playerX + dx;
-    int new_y = st->playerY + dy;
-    
-    if (mapa_pode_andar(new_x, new_y)) {
-        st->playerX += dx;
-        st->playerY += dy;
- }
-}
-
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
 
     int key = getch();
@@ -118,56 +106,51 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             break;
     }
 
-    // atualiza o estado dos inimigos
+        // Atualiza o estado dos inimigos
     for (int i = 0; i < num_mobs; i++) {
-        // verifique se o inimigo está vivo
+    // Verifica se o inimigo está vivo
         if (mobs[i].hp > 0) {
-            // verifique se o inimigo está adjacente ao jogador
-            if ((abs(mobs[i].x - st->playerX) <= 1) && (abs(mobs[i].y - st->playerY) <= 1)) {
-                // inicie uma batalha
-                int damage_to_player = mobs[i].atk - st->playerDef;
-                int damage_to_mob = st->playerAtk - mobs[i].def;
-                if (damage_to_player > 0) {
-                    st->playerHp -= damage_to_player;
+        // Verifica se o inimigo está adjacente ao jogador
+        if (abs(mobs[i].x - st->playerX) <= 1 && abs(mobs[i].y - st->playerY) <= 1) {
+            mobAttack(st, &mobs[i]);
+            st->playerHp -= mobs[i].atk;
+        } else {
+            // Caso contrário, move o inimigo aleatoriamente
+            int dx = rand() % 3 - 1;
+            int dy = rand() % 3 - 1;
+            int new_x = mobs[i].x + dx;
+            int new_y = mobs[i].y + dy;
+
+            // Verifica se o novo local está dentro dos limites do mapa
+            if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+                // Verifica se o novo local está dentro da distância permitida do jogador
+                if (abs(st->playerX - new_x) <= 1 && abs(st->playerY - new_y) <= 1) {
+                    attron(COLOR_PAIR(2));
+                    mvaddch(mobs[i].x, mobs[i].y, ' ');
+                    attroff(COLOR_PAIR(2));
+                } else if (mvinch(new_x, new_y) == '-') {
+                    attron(COLOR_PAIR(4));
+                    mvaddch(mobs[i].x, mobs[i].y, '-');
+                    attroff(COLOR_PAIR(4));
+                } else {
+                    attron(COLOR_PAIR(1));
+                    mvaddch(mobs[i].x, mobs[i].y, '.');
+                    attroff(COLOR_PAIR(1));
                 }
-                if (damage_to_mob > 0) {
-                    mobs[i].hp -= damage_to_mob;
-                }
-            } else {
-                // caso contrário, mova o inimigo aleatoriamente
-                int dx = rand() % 3 - 1;
-                int dy = rand() % 3 - 1;
-                if (dx != 0 || dy != 0) {
-                    int new_x = mobs[i].x + dx;
-                    int new_y = mobs[i].y + dy;
-                    if ((pow((st->playerX-new_x),2)+pow((st->playerY-new_y),2))<=36) {
-                     attron(COLOR_PAIR(2));
-                     mvaddch(mobs[i].x, mobs[i].y, ' ');
-                     attroff(COLOR_PAIR(2));                    
-                    }
-                    else{ 
-                         if (mvinch(new_x, new_y) == '-') {
-                            attron(COLOR_PAIR(4));
-                            mvaddch(mobs[i].x, mobs[i].y, '-');
-                            attroff(COLOR_PAIR(4));                   
-                        }
-                        else {
-                            attron(COLOR_PAIR(1));
-                            mvaddch(mobs[i].x, mobs[i].y, '.');
-                            attroff(COLOR_PAIR(1));                        
-                         }
-                        }
-                    if (mapa_pode_andar(new_x, new_y) && new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
-                        mobs[i].x = new_x;
-                        mobs[i].y = new_y;
-                    }
+
+                if (mapa_pode_andar(new_x, new_y)) {
+                    mobs[i].x = new_x;
+                    mobs[i].y = new_y;
                 }
             }
-            // renderize o inimigo na tela
-            mvaddch(mobs[i].x, mobs[i].y, 'M');
         }
+
+        // Renderiza o inimigo na tela
+        mvaddch(mobs[i].x, mobs[i].y, 'M');
     }
-    }
+
+    }    
+}
     else {
        switch(key) {
         case 'q':  // fecha o jogo
@@ -229,6 +212,17 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             update_stats_window(stats_window, st);
 }
 
+
+void do_movement_action(STATE *st, int dx, int dy) {
+
+    int new_x = st->playerX + dx;
+    int new_y = st->playerY + dy;
+    
+    if (mapa_pode_andar(new_x, new_y)) {
+        st->playerX += dx;
+        st->playerY += dy;
+ }
+}
 
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {
@@ -413,6 +407,44 @@ int i;
    const char* message = "Item Apagado!";
    add_message(msg_window, message);
 }
+
+void mobAttack(STATE *st, MOB *mob) {
+    int damage_to_player = mob->atk - st->playerDef;
+    if (damage_to_player > 0) {
+        st->playerHp -= damage_to_player;
+    }
+}
+
+void gameOver() {
+    clear();  // Limpa a tela
+    refresh();
+
+    // Cria uma nova janela para exibir "Game Over" em tamanho grande
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    WINDOW* game_over_win = newwin(rows, cols, 0, 0);
+
+    // Configura as cores
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    attron(COLOR_PAIR(1) | A_BOLD);
+
+    // Centraliza a mensagem "Game Over" na janela
+    int x = (cols - 9) / 2;
+    int y = rows / 2;
+
+    mvwprintw(game_over_win, y, x, "Game Over");
+
+    // Atualiza a janela e aguarda um tempo antes de encerrar o jogo
+    wrefresh(game_over_win);
+    napms(2000);  // Aguarda 2 segundos
+
+    // Limpa a janela e libera a memória
+    delwin(game_over_win);
+    endwin();
+    exit(0);  // Encerra o programa
+}
+
 
 
 

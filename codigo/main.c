@@ -11,7 +11,7 @@
 int main() {
 	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
-	MOB mob = {15,15,10,10,10};
+	MOB mob = {15,15,10,10,10,'M'};
 	int num_mobs = 10;
 
 	WINDOW *wnd = initscr(); // inicializa a tela
@@ -84,6 +84,7 @@ int main() {
 
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);
+        if (st.playerHp <=0) gameOver();
 	}
     // limpa a janela de stats e encerra o ncurses
      delwin(stats_window);

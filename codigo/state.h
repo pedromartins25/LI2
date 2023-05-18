@@ -35,6 +35,7 @@ typedef struct {
     int hp;
     int atk;
     int def;
+    char symbol;
 } MOB;
 
 typedef struct STATE {
@@ -69,5 +70,8 @@ void init_message_window(MessageWindow* msg_window);
 void add_message(MessageWindow* msg_window, const char* message);
 void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col);
 void dropItem(STATE *st, MessageWindow* msg_window);
+
+void mobAttack(STATE *st, MOB *mob);
+void gameOver();
 
 #endif
