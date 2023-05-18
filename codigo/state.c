@@ -40,32 +40,32 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_A1:
         case '7': 
             endmap(st, 1, rows, cols);
-            nextlevel(st, 1, rows, cols); 
-            itemPickUp(st, 1); 
+            nextlevel(st, 1, rows, cols, msg_window); 
+            itemPickUp(st, 1, msg_window); 
             do_movement_action(st, -1, -1); 
             drawlight(st, rows, cols); 
             break;
         case KEY_UP:
         case '8': 
             endmap(st, 1, rows, cols);
-            nextlevel(st, 1, rows, cols); 
-            itemPickUp(st, 1); 
+            nextlevel(st, 1, rows, cols, msg_window); 
+            itemPickUp(st, 1, msg_window); 
             do_movement_action(st, -1, +0); 
             drawlight(st, rows, cols); 
             break;
         case KEY_A3:
         case '9': 
             endmap(st, 1, rows, cols); 
-            nextlevel(st, 1, rows, cols); 
-            itemPickUp(st, 1); 
+            nextlevel(st, 1, rows, cols, msg_window); 
+            itemPickUp(st, 1, msg_window); 
             do_movement_action(st, -1, +1); 
             drawlight(st, rows, cols); 
             break;
         case KEY_LEFT:
         case '4': 
             endmap(st, 3, rows, cols); 
-            nextlevel(st, 3, rows, cols); 
-            itemPickUp(st, 3); 
+            nextlevel(st, 3, rows, cols, msg_window); 
+            itemPickUp(st, 3, msg_window); 
             do_movement_action(st, +0, -1); 
             drawlight(st, rows, cols); 
             break;
@@ -75,32 +75,32 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_RIGHT:
         case '6': 
             endmap(st, 4, rows, cols); 
-            nextlevel(st, 4, rows, cols); 
-            itemPickUp(st, 4); 
+            nextlevel(st, 4, rows, cols, msg_window); 
+            itemPickUp(st, 4, msg_window); 
             do_movement_action(st, +0, +1); 
             drawlight(st, rows, cols); 
             break;
         case KEY_C1:
         case '1': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols); 
-            itemPickUp(st, 2); 
+            nextlevel(st, 2, rows, cols, msg_window); 
+            itemPickUp(st, 2, msg_window); 
             do_movement_action(st, +1, -1); 
             drawlight(st, rows, cols); 
             break;
         case KEY_DOWN:
         case '2': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols); 
-            itemPickUp(st, 2); 
+            nextlevel(st, 2, rows, cols, msg_window); 
+            itemPickUp(st, 2, msg_window); 
             do_movement_action(st, +1, +0); 
             drawlight(st, rows, cols); 
             break;
         case KEY_C3:
         case '3': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols); 
-            itemPickUp(st, 2);
+            nextlevel(st, 2, rows, cols, msg_window); 
+            itemPickUp(st, 2, msg_window);
             do_movement_action(st, +1, +1); 
             drawlight(st, rows, cols); 
             break;
@@ -109,7 +109,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             exit(0); 
             break;
         case 'm':  // abre o inventario e pausa o jogo
-            printInventory(st->inv, inv_window, st->n, st->m);
+            printInventory(st->inv, inv_window, st->n=0, st->m=8);
             printEquip(st->equip, 3, equip_window);
             st->menu=1;
             mvwprintw(inv_window,3, 1, ">");
@@ -255,10 +255,11 @@ Item temp;
    st->playerAtk += st->equip[0].stat;
    st->inv[st->equipPos-3] = temp;
     // Adicione uma mensagem à janela de mensagens
-   const char* message = "Item equipado!";
+   const char* message = "Item equipado!            ";
    add_message(msg_window, message);
    
   }
+  else {
   if (st->inv[st->equipPos-3].type == 9) { // no caso de ser uma armadura
    st->playerDef -= st->equip[1].stat;
    temp = st->equip[1];
@@ -266,9 +267,10 @@ Item temp;
    st->playerDef += st->equip[1].stat;
    st->inv[st->equipPos-3] = temp;
     // Adicione uma mensagem à janela de mensagens
-    const char* message = "Item equipado!";
+    const char* message = "Item equipado!            ";
     add_message(msg_window, message);
   }
+  else {
   if (st->inv[st->equipPos-3].type == 10) { // no caso de ser um colar
    st->playerHp -= st->equip[2].stat;
    temp = st->equip[2];
@@ -276,9 +278,16 @@ Item temp;
    st->playerHp += st->equip[2].stat;
    st->inv[st->equipPos-3] = temp;
    // Adicione uma mensagem à janela de mensagens
-   const char* message = "Item equipado!";
+   const char* message = "Item equipado!            ";
    add_message(msg_window, message);
   }
+  else {
+   // Adicione uma mensagem à janela de mensagens
+   const char* message = "Não é possível equipar!";
+   add_message(msg_window, message);  
+  }
+  }
+ }
 }
 
 void printEquip(Item *equip, int len, WINDOW *equip_window) {
@@ -343,18 +352,29 @@ void init_message_window(MessageWindow* msg_window) {
 }
 
 void add_message(MessageWindow* msg_window, const char* message) {
-    if (msg_window->num_messages < MAX_MESSAGES) {
+    if (msg_window->num_messages <= MAX_MESSAGES) {
+     if (msg_window->num_messages > 1) {
         // Move todas as mensagens existentes uma posição para cima
-        for (int i = msg_window->num_messages - 1; i > 0; i--) {
+        for (int i = msg_window->num_messages-1; i > 0; i--) {
+           if (msg_window->num_messages == MAX_MESSAGES) {
             strcpy(msg_window->messages[i], msg_window->messages[i - 1]);
+           }
+           else {
+            strcpy(msg_window->messages[i+1], msg_window->messages[i]);
+            strcpy(msg_window->messages[i], msg_window->messages[i - 1]);
+           }
         }
-
+       }
+     else {  
+      strcpy(msg_window->messages[1], msg_window->messages[0]);
+     }
         // Adiciona a nova mensagem na posição 0
         strcpy(msg_window->messages[0], message);
 
         // Incrementa o número de mensagens, mas garante que não exceda o limite
         msg_window->num_messages++;
         if (msg_window->num_messages > MAX_MESSAGES) {
+            msg_window->messages[msg_window->num_messages-1][0]=0;
             msg_window->num_messages = MAX_MESSAGES;
         }
     }

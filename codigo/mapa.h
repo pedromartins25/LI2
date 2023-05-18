@@ -15,6 +15,9 @@
 
 typedef struct STATE STATE;
 
+typedef struct MessageWindow MessageWindow;
+
+
 
 void gerarMundo(int templateRows, int templateCols);
 
@@ -24,11 +27,11 @@ int mapa_pode_andar (int x, int y);
 
 void endmap(STATE *st, int i, int rows, int cols);
 
-void nextlevel(STATE *st, int i, int rows, int cols);
+void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window);
 
 void gerar_Random_item(int templateRows, int templateCols);
 
-void itemPickUp(STATE *st, int i);
+void itemPickUp(STATE *st, int i, MessageWindow* msg_window);
 
 void inventory(int i,int row,int col);
 

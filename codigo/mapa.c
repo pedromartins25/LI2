@@ -489,7 +489,7 @@ void endmap(STATE *st, int i, int rows, int cols) {
     }
 }
 
-void nextlevel(STATE *st, int i, int rows, int cols) {
+void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) {
     
     int x = st->playerX;
     int y = st->playerY;
@@ -501,6 +501,10 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
             srandom(time(NULL));
+            st->level++;
+        // Adicione uma mensagem à janela de mensagens
+        const char* message = "Subiu de nível!           ";
+        add_message(msg_window, message);
         }
     }
     if (i == 2) {  // no caso de andar para baixo
@@ -509,6 +513,10 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
             srandom(time(NULL));
+            st->level++;
+        // Adicione uma mensagem à janela de mensagens
+        const char* message = "Subiu de nível!           ";
+        add_message(msg_window, message);            
         }
     }
     if (i == 3) {  // no caso de andar para a esquerda
@@ -517,6 +525,10 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
             srandom(time(NULL));
+            st->level++;
+        // Adicione uma mensagem à janela de mensagens
+        const char* message = "Subiu de nível!           ";
+        add_message(msg_window, message);            
         }
     }
     if (i == 4) {  // no caso de andar para a direita
@@ -525,6 +537,10 @@ void nextlevel(STATE *st, int i, int rows, int cols) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
             srandom(time(NULL));
+            st->level++;
+        // Adicione uma mensagem à janela de mensagens
+        const char* message = "Subiu de nível!           ";
+        add_message(msg_window, message);            
         }
     }
 }
@@ -578,7 +594,7 @@ int i;
  return 0;
 }
 
-Item createItem(Item i) {  // cria um item depois de ser apanhado, mudando o nome e stats
+Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudando o nome e stats
     int j;
     double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};  // cria probabilidades para os items
     srand(time(NULL));
@@ -593,37 +609,38 @@ Item createItem(Item i) {  // cria um item depois de ser apanhado, mudando o nom
   switch (j) {
    case 0: 
        strcat(i.name," de ferro");
-       i.stat += 1;
+       i.stat += 1*l;
        return i;
    case 1: 
        strcat(i.name," de Diamante");
-       i.stat += 2;
+       i.stat += 2*l;
        return i;
    case 2: 
        strcat(i.name," de Mitril");
-       i.stat += 3;
+       i.stat += 3*l;
        return i;
    case 3: 
-       strcat(i.name," Divinda");
-       i.stat += 4;
+       strcat(i.name," Divino");
+       i.stat += 4*l;
        return i;
    case 4: 
        strcat(i.name," das Trevas");
-       i.stat += 5; 
+       i.stat += 5*l; 
        return i;  
   }
   return i;
 }
 
-void itemUpdate(STATE *st, char c) {  // Adiciona items ao inventário e modifica os stats do player
+void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h') {
     switch(c) {
     case '!': 
-        st->inv[st->len]=createItem(items[0]); // adiciona o item ao inventário
+        st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário
         st->len++; 
         break;
     case '|': 
-        st->inv[st->len]=createItem(items[1]); 
+        st->inv[st->len]=createItem(items[1], st->level); 
         st->len++; 
         break;
     case 'D':  
@@ -671,23 +688,27 @@ int i=0;
         } 
         break;
     case '%':
-        st->inv[st->len]=createItem(items[2]);  
+        st->inv[st->len]=createItem(items[2], st->level);  
         st->len++; 
         break;
     case 'A':  
-        st->inv[st->len]=createItem(items[8]); 
+        st->inv[st->len]=createItem(items[8], st->level); 
         st->len++; 
         break;
     case 'C': 
-        st->inv[st->len]=createItem(items[9]); 
+        st->inv[st->len]=createItem(items[9], st->level); 
         st->len++; 
         break;
     }
+   // Adicione uma mensagem à janela de mensagens
+   const char* message = "Item Apanhado!            ";
+   add_message(msg_window, message);
+   }
 }
 
 
 
-void itemPickUp(STATE *st, int i) {
+void itemPickUp(STATE *st, int i, MessageWindow* msg_window) {
     
     int x = st->playerX;
     int y = st->playerY;
@@ -695,19 +716,19 @@ void itemPickUp(STATE *st, int i) {
 
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
-        itemUpdate(st, c);
+        itemUpdate(st, c, msg_window);
     }
     if (i == 2) {  // no caso de andar para baixo
         c = mvinch(x+1,y);
-        itemUpdate(st, c);
+        itemUpdate(st, c,msg_window);      
     }
     if (i == 3) {  // no caso de andar para a esquerda
         c = mvinch(x,y-1);
-        itemUpdate(st, c);
+        itemUpdate(st, c, msg_window);       
     }
     if (i == 4) {  // no caso de andar para a direita
         c = mvinch(x,y+1);
-        itemUpdate(st, c);
+        itemUpdate(st, c, msg_window);      
     }
 }
 
