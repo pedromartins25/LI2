@@ -19,7 +19,7 @@ int main() {
 	getmaxyx(wnd,nrows,ncols); // número maximo de linhas e colunas que a janela pode conter
 	templateRows = nrows - (nrows%TEMPLATE_SIZE) - TEMPLATE_SIZE; templateCols = ncols - (ncols%TEMPLATE_SIZE) - TEMPLATE_SIZE; // número de linhas e colunas do mapa
 
-	srandom(time(NULL));
+	srand(time(NULL));
 	start_color(); // Inicializa a biblioteca de cores do ncurse
 	curs_set(0);
 	cbreak();
@@ -28,13 +28,14 @@ int main() {
 	intrflush(stdscr, false);
 	keypad(stdscr, true);
 	
- 	if (nrows>30 && ncols >30) {
+ 	if (nrows>=32 && ncols >=111) {
            // inicialização das cores e os pairs necessários
         init_color(STATS, 100,200,700);
         init_color(DARKFLOOR,250,250,250);
         init_color(DARKWALL,100,100,100);
         init_color(WALL,200,200,200);
         init_color(FLOOR,500,500,500);
+        init_color(55,500,250,0);
 	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
         init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
         init_pair(COLOR_BLUE, COLOR_BLUE, 14);
@@ -44,6 +45,7 @@ int main() {
         init_pair(3, COLOR_BLACK, WALL);
         init_pair(4, DARKFLOOR, DARKFLOOR);
         init_pair(5, WALL, DARKWALL);
+        init_pair(6, 55, 55);
         init_pair(15,COLOR_BLUE, COLOR_BLACK);
         init_pair(16,COLOR_BLACK, COLOR_RED);
         init_pair(17,COLOR_BLUE, FLOOR); // player color

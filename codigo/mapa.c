@@ -173,7 +173,7 @@ void template10(int w, int k) {
 
 void template11(int w, int k) {
     
-    attron(COLOR_PAIR(1));
+    attron(COLOR_PAIR(2));
     mvprintw(w*10, k*10,   "hhhh..hhhh");
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
@@ -184,7 +184,7 @@ void template11(int w, int k) {
     mvprintw(w*10+7, k*10, "h........h");
     mvprintw(w*10+8, k*10, "h........h");
     mvprintw(w*10+9, k*10, "hhhh..hhhh");
-    attroff(COLOR_PAIR(1));
+    attroff(COLOR_PAIR(2));
 }
 
   // Restrem a criação de novas salas para o mapa ser compativel
@@ -204,10 +204,9 @@ int correct_template(int pt) {
             return c;
         }
         else {
-            if (pt == 10) {
-                c = (rand() % ((3-2) + 2)) + 2;
-                if (c != 2) c = 10;
-            }
+           if (pt == 10) {
+              c = (rand() % 2) + 2;  // Generate random number between 2 and 3
+             }
             else {
                 c = (rand() % ((10-1) + 1)) + 1;
                 return c;
@@ -221,9 +220,10 @@ int correct_template(int pt) {
 void generate_template(int templateRows, int templateCols, int templateMap[templateRows][templateCols]) {
 
     int i,j;
+    memset(templateMap, 0, templateRows * templateCols * sizeof(int));
     
-    i = (rand() % (((templateRows/10-1)-1)+1)) + 1;
-    j = (rand() % (((templateCols/10-1)-1)+1)) + 1; 
+    i = rand() % (templateRows/10);
+    j = rand() % (templateCols/10-1)+1;
     templateMap[i][j] = 11;
     for (i=0; i<templateRows; i++) {
         for (j=0; j<templateCols; j++) {
@@ -240,8 +240,8 @@ void generate_template(int templateRows, int templateCols, int templateMap[templ
 
 // apaga o mada no ecrã quando um novo é criado
 void reset_map(int templateRows,int templateCols) {
- for (int i = 0; i <= templateRows; i++) {
-  for (int j = 0; j <= templateCols; j++) {
+ for (int i = 0; i < templateRows; i++) {
+  for (int j = 0; j < templateCols; j++) {
     attron(COLOR_PAIR(1));
     mvaddch(i,j,' ');
     attroff(COLOR_PAIR(1));
@@ -300,18 +300,13 @@ void generate_map(int templateRows, int templateCols) {
     }
 }
 
-for (i=0; i<x;i++) {
-    for (j=0; j<y; j++) {
-        templateMap[i][j] = 0;
-    }
-}
 }
 
   // Verifica se a entidade pode fazer um certo movimento
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
-    if (c != 'H' && c != 'h' && c != '+' && c != 'M') return 1;
+    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L') return 1;
     return 0;
 }
 
@@ -330,11 +325,18 @@ if (c=='H') {  // modifica as paredes iluminadas
     attroff(COLOR_PAIR(5)); 
 }
 else {
+if (c=='L') {
+    attron(COLOR_PAIR(6));
+    mvaddch(j,i,'L');
+    attroff(COLOR_PAIR(6));
+}
+else {
  if(c=='!'||c=='|'||c=='D'||c=='I'||c=='F'||c=='*'||c=='G'||c=='A'||c=='C') {
     attron(COLOR_PAIR(4));
     mvaddch(j,i,c);
     attroff(COLOR_PAIR(4));
    }
+  }
 }
 }
 }
@@ -360,9 +362,16 @@ if (c=='s' || c=='S') {  // transforma as escadas não iluminadas
     attroff(COLOR_PAIR(COLOR_WHITE));
 }
 else {
+if (c=='L') {
+    attron(COLOR_PAIR(6));
+    mvaddch(j,i,'L');
+    attroff(COLOR_PAIR(6));
+}
+else {
     attron(COLOR_PAIR(COLOR_WHITE));
     mvaddch(j,i,c);
     attroff(COLOR_PAIR(COLOR_WHITE));
+}
 }
 }
 }
@@ -489,6 +498,45 @@ void endmap(STATE *st, int i, int rows, int cols) {
     }
 }
 
+void lights(int rows, int cols) {
+ for (int i = 0; i<rows; i++) {
+  for (int j = 0; j<cols; j++) {
+   if (mvinch(i,j) == 'L') {
+    STATE l = {i,j,0,0,0,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0}},0,0,0,0,0,0};
+    drawlight(&l, rows, cols);
+   }
+  }
+ }
+}
+
+void bossLevel(int rows,int cols) {
+  reset_map(rows,cols);
+  for (int i=0; i<rows; i++) {
+   for (int j=0; j<cols; j++) {
+    if (i != 0 && i != rows-1) {
+     attron(COLOR_PAIR(3));
+     mvaddch(i,0,'H');
+     mvaddch(i,cols-1,'H');
+     attroff(COLOR_PAIR(3));
+    }
+    else {
+     attron(COLOR_PAIR(3));
+     mvaddch(i,j,'H');
+     attroff(COLOR_PAIR(3));
+    }
+   }
+  }
+  for (int i=5; i<rows; i+=10) {
+   for (int j=5; j<cols; j+=10) {
+     attron(COLOR_PAIR(6));
+     mvaddch(i,j,'L');
+     attroff(COLOR_PAIR(6));
+   }
+  }
+  lights(rows, cols);
+}
+
+
 void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) {
     
     int x = st->playerX;
@@ -498,10 +546,16 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
         if (c == 'S') {
+           if (st->level < 2) {
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
-            srandom(time(NULL));
             st->level++;
+           }
+          else {
+            bossLevel(rows, cols);
+            st->playerX=6; st->playerY=5;
+            st->level++;            
+          }
         // Adicione uma mensagem à janela de mensagens
         const char* message = "Subiu de nível!           ";
         add_message(msg_window, message);
@@ -510,10 +564,16 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 2) {  // no caso de andar para baixo
         c = mvinch(x+1,y);
         if (c == 'S') {
+          if (st->level < 2) {
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
-            srandom(time(NULL));
             st->level++;
+           }
+          else {
+            bossLevel(rows, cols);
+            st->playerX=6; st->playerY=5;
+            st->level++; 
+           } 
         // Adicione uma mensagem à janela de mensagens
         const char* message = "Subiu de nível!           ";
         add_message(msg_window, message);            
@@ -522,10 +582,16 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 3) {  // no caso de andar para a esquerda
         c = mvinch(x,y-1);
         if (c == 'S') {
+          if (st->level < 2) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
-            srandom(time(NULL));
             st->level++;
+           }
+          else {
+            bossLevel(rows, cols);
+            st->playerX=6; st->playerY=5;
+            st->level++; 
+           } 
         // Adicione uma mensagem à janela de mensagens
         const char* message = "Subiu de nível!           ";
         add_message(msg_window, message);            
@@ -534,10 +600,16 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 4) {  // no caso de andar para a direita
         c = mvinch(x,y+1);
         if (c == 'S') {
+          if (st->level < 2) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
-            srandom(time(NULL));
             st->level++;
+           }
+          else {
+            bossLevel(rows, cols);
+            st->playerX=6; st->playerY=5;
+            st->level++; 
+           } 
         // Adicione uma mensagem à janela de mensagens
         const char* message = "Subiu de nível!           ";
         add_message(msg_window, message);            
@@ -551,9 +623,9 @@ Item items[10] = {{"Faca", 1, 2, '!',2,1,0},
                  {"Bomba Defensiva", 7,8, 'D',0, 4,1},
                  {"Bomba Incendiária", 9, 10, 'I',0, 5,1},
                  {"Flashbang", 11, 12, 'F',0, 6,1},
-                 {"Nightstick", 13, 14, '*',0, 7,0},
+                 {"Poção de cura", 13, 14, '*',25, 7,1},
                  {"Bomba de fumo", 15,16, '#',0, 8,1},
-                 {"Armadura", 17, 18, 'A',5,9,0},
+                 {"Escudo", 17, 18, 'A',5,9,0},
                  {"Colar", 19, 20, 'C',20, 10,0} 
              };
 
@@ -569,7 +641,7 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
         r = rand() % 10;
 
         item = items[r];
-        while (mapa_pode_andar(x, y) != 1) {
+        while (mapa_pode_andar(x, y) != 1 && mvinch(x,y)!='S') {
          x = (rand() % (((templateRows)-1)+1)) + 1;
          y = (rand() % (((templateCols)-1)+1)) + 1;        
         }
@@ -597,7 +669,6 @@ int i;
 Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudando o nome e stats
     int j;
     double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};  // cria probabilidades para os items
-    srand(time(NULL));
     double rn = (double) rand() / RAND_MAX;
     double cn = 0.0;
     for (j = 0; j < 5; j++) {  // seleciona o numero
@@ -633,7 +704,7 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
-  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M') {
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário
@@ -674,8 +745,14 @@ int i=0;
         }  
         break;
     case '*': 
-        st->inv[st->len]=items[6]; 
-        st->len++; 
+        i = exists(items[6], st->len, st->inv);
+        if (i != 0) {
+        st->inv[i].quantity++;
+        }
+        else {
+        st->inv[st->len]=items[6];
+        st->len++;
+        }   
         break;
     case '#': 
         i = exists(items[7], st->len, st->inv);
@@ -736,7 +813,8 @@ void itemPickUp(STATE *st, int i, MessageWindow* msg_window) {
 void gerarMundo(int templateRows, int templateCols) {
     
     int i;
-
+    
+    reset_map(templateRows, templateCols);
     generate_map(templateRows, templateCols);
     for (i=0; i < N_MAXIMO_ITEMS; i++) {  // cria um certo número de items
     gerar_Random_item(templateRows, templateCols); // funções para adicionar itens

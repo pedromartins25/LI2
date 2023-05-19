@@ -35,7 +35,6 @@ typedef struct {
     int hp;
     int atk;
     int def;
-    char symbol;
 } MOB;
 
 typedef struct STATE {

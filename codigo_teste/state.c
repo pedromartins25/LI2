@@ -21,6 +21,7 @@ void do_movement_action(STATE *st, int dx, int dy) {
  }
 }
 
+
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window) {
     
     int key = getch();
@@ -31,6 +32,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
     inv_window = newwin(rows - 2, cols/2-2, INV_WINDOW_Y, INV_WINDOW_X);
     equip_window = newwin(rows - 2, cols/2-2, EQUIP_WINDOW_Y, cols/2); 
 
+    lights(rows,cols);
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
     attroff(COLOR_PAIR(2));
@@ -209,6 +211,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             break;       
        }
     }
+            lights(rows,cols);
             update_stats_window(stats_window, st);
 }
 
@@ -249,6 +252,9 @@ Item temp;
    st->equip[2] = st->inv[st->equipPos-3];  
    st->playerHp += st->equip[2].stat;
    st->inv[st->equipPos-3] = temp;
+  }
+  if (st->inv[st->equipPos-3].type == 6) {
+   if 
   }
 }
 

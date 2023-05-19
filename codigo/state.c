@@ -10,6 +10,18 @@
 #include "mapa.h"
 
 
+
+void do_movement_action(STATE *st, int dx, int dy) {
+
+    int new_x = st->playerX + dx;
+    int new_y = st->playerY + dy;
+    
+    if (mapa_pode_andar(new_x, new_y)) {
+        st->playerX += dx;
+        st->playerY += dy;
+ }
+}
+
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
 
     int key = getch();
@@ -106,6 +118,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             break;
     }
 
+
         // Atualiza o estado dos inimigos
     for (int i = 0; i < num_mobs; i++) {
     // Verifica se o inimigo está vivo
@@ -148,9 +161,8 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         // Renderiza o inimigo na tela
         mvaddch(mobs[i].x, mobs[i].y, 'M');
     }
-
-    }    
-}
+    }
+    }
     else {
        switch(key) {
         case 'q':  // fecha o jogo
@@ -209,20 +221,10 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             break;       
        }
     }
+            lights(rows,cols);
             update_stats_window(stats_window, st);
 }
 
-
-void do_movement_action(STATE *st, int dx, int dy) {
-
-    int new_x = st->playerX + dx;
-    int new_y = st->playerY + dy;
-    
-    if (mapa_pode_andar(new_x, new_y)) {
-        st->playerX += dx;
-        st->playerY += dy;
- }
-}
 
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {
@@ -276,9 +278,23 @@ Item temp;
    add_message(msg_window, message);
   }
   else {
-   // Adicione uma mensagem à janela de mensagens
-   const char* message = "Não é possível equipar!";
-   add_message(msg_window, message);  
+   if (st->inv[st->equipPos-3].type == 7) {
+    if (st->playerHp + st->inv[st->equipPos-3].stat >= 100+st->equip[2].stat) {
+     st->playerHp = 100+st->equip[2].stat;
+    }
+    else {
+     st->playerHp += st->inv[st->equipPos-3].stat;
+    }
+    st->inv[st->equipPos-3].quantity --;
+    // Adicione uma mensagem à janela de mensagens
+    const char* message = "Curado!";
+    add_message(msg_window, message); 
+   }
+   else {
+    // Adicione uma mensagem à janela de mensagens
+    const char* message = "Não é possível equipar!";
+    add_message(msg_window, message);  
+   }
   }
   }
  }
@@ -444,7 +460,4 @@ void gameOver() {
     endwin();
     exit(0);  // Encerra o programa
 }
-
-
-
 
