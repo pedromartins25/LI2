@@ -28,7 +28,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_A1:
         case '7': 
             endmap(st, 1, rows, cols);
-            nextlevel(st, 1, rows, cols, msg_window); 
+            nextlevel(st, 1, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 1, msg_window); 
             do_movement_action(st, mobs, num_mobs,-1, -1, msg_window); 
             drawlight(st, rows, cols); 
@@ -36,7 +36,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_UP:
         case '8': 
             endmap(st, 1, rows, cols);
-            nextlevel(st, 1, rows, cols, msg_window); 
+            nextlevel(st, 1, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 1, msg_window); 
             do_movement_action(st, mobs, num_mobs,-1, +0, msg_window); 
             drawlight(st, rows, cols); 
@@ -44,7 +44,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_A3:
         case '9': 
             endmap(st, 1, rows, cols); 
-            nextlevel(st, 1, rows, cols, msg_window); 
+            nextlevel(st, 1, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 1, msg_window); 
             do_movement_action(st, mobs, num_mobs,-1, +1, msg_window); 
             drawlight(st, rows, cols); 
@@ -52,7 +52,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_LEFT:
         case '4': 
             endmap(st, 3, rows, cols); 
-            nextlevel(st, 3, rows, cols, msg_window); 
+            nextlevel(st, 3, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 3, msg_window); 
             do_movement_action(st, mobs, num_mobs,+0, -1, msg_window); 
             drawlight(st, rows, cols); 
@@ -63,7 +63,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_RIGHT:
         case '6': 
             endmap(st, 4, rows, cols); 
-            nextlevel(st, 4, rows, cols, msg_window); 
+            nextlevel(st, 4, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 4, msg_window); 
             do_movement_action(st, mobs, num_mobs,+0, +1, msg_window); 
             drawlight(st, rows, cols); 
@@ -71,7 +71,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_C1:
         case '1': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols, msg_window); 
+            nextlevel(st, 2, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 2, msg_window); 
             do_movement_action(st, mobs, num_mobs,+1, -1, msg_window); 
             drawlight(st, rows, cols); 
@@ -79,7 +79,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_DOWN:
         case '2': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols, msg_window); 
+            nextlevel(st, 2, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 2, msg_window); 
             do_movement_action(st, mobs, num_mobs,+1, +0, msg_window); 
             drawlight(st, rows, cols); 
@@ -87,7 +87,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
         case KEY_C3:
         case '3': 
             endmap(st, 2, rows, cols); 
-            nextlevel(st, 2, rows, cols, msg_window); 
+            nextlevel(st, 2, rows, cols, msg_window, mobs, num_mobs); 
             itemPickUp(st, 2, msg_window);
             do_movement_action(st, mobs, num_mobs,+1, +1, msg_window); 
             drawlight(st, rows, cols); 
@@ -207,25 +207,28 @@ void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, Mess
     }
 }
 
+
+// Função para atacar uma mob
 void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
+    // Reduz a vida da mob com base no ataque do jogador
     int dano;
     char message[100]; 
     dano = st->playerAtk - mob->def;
-
-    if (dano <= 0) dano = 1;
     mob->hp -= dano;
-
-    if (mob->hp <= 0) {
-        snprintf(message, sizeof(message), "%s foi derrotado.\n", mob->name);
+    if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
+        snprintf(message, sizeof(message), "A mob foi derrotada.\n");
         mob->hp = 0;
-    } else {
-        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano);
-        add_message(msg_window, message);
-
-        snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
     }
-
+    else {
+        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano); 
+    
+    // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
+       snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
+    
+    // Adiciona a mensagem à janela de mensagens
+    add_message(msg_window, message);
+   }
 }
 
 
@@ -443,7 +446,7 @@ void mobAttack(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
     // Cria uma mensagem com o dano causado pela mob
     char message[100];
-    snprintf(message, sizeof(message), "%s causou %d de dano.", mob->name, damage_to_player);
+    snprintf(message, sizeof(message), "A mob causou %d de dano.", damage_to_player);
 
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
@@ -465,7 +468,7 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
             // Verifica se o inimigo está adjacente ao jogador
             if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
                 mobAttack(st, &mobs[i], msg_window);
-                // st->playerHp -= st->playerDef - mobs[i].atk;
+                // st->playerHp -= mobs[i].atk;
             } else {
                 // Caso contrário, move o inimigo aleatoriamente
                 int dx = rand() % 3 - 1;
@@ -530,7 +533,12 @@ COORD generateRandomCoords(int rows, int cols) {
     COORD coords;
     coords.x = rand() % rows;
     coords.y = rand() % cols;
+    if (mapa_pode_andar(coords.x,coords.y)) {
     return coords;
+    }
+    else {
+     return generateRandomCoords(rows,cols);
+    }
 }
 
 

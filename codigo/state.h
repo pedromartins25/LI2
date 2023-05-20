@@ -28,13 +28,12 @@ typedef struct {
     int quantity;
 } Item;
 
-typedef struct {
+typedef struct  COORD{
     int x;
     int y;
 } COORD;
 
-typedef struct {
-
+typedef struct MOB {
     char name[20];
     int x;
     int y;

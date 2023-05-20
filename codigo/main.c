@@ -54,24 +54,10 @@ int main() {
         init_pair(17,COLOR_BLUE, FLOOR); // player color
         init_pair(18, COLOR_BLACK, FLOOR); // player color
 
-	gerarMundo(templateRows, templateCols);
+	gerarMundo(templateRows, templateCols, mobs, num_mobs, &st);
 	drawlight(&st, templateRows, templateCols);
 
 	    // inicializa a tela do ncurses
-
-	    // Inicializar mobs
-    for (int i = 0; i < num_mobs; i++) {
-        COORD coords = generateRandomCoords(templateRows, templateCols);
-        int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
-
-        if (probability < 50) {
-            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 10, 12, 10, '&', false};  // STUPID
-        } else if (probability < 80) {
-            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 15, 14, 8, '~', false};   // COWARD
-        } else {
-            mobs[i] = (MOB){"Wizard", coords.x, coords.y, 8, 18, 6, 'W', false};     // SMART
-        }
-    }
 
     // cria a janela de stats
     int stats_height = 5;
@@ -119,7 +105,7 @@ int main() {
 		&msg_window, ncols);
 
         draw_message_window(msg_wnd, &msg_window, 0, 0);
-
+        lights(templateRows, templateCols);
 
 		        // atualiza a janela de stats
         update_stats_window(stats_window, &st);

@@ -34,7 +34,7 @@ void template2(int w, int k) {
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
     mvprintw(w*10+3, k*10, "h........h");
-    mvprintw(w*10+4, k*10, "..........");
+    mvprintw(w*10+4, k*10, ".....s....");
     mvprintw(w*10+5, k*10, "..........");
     mvprintw(w*10+6, k*10, "h........h");
     mvprintw(w*10+7, k*10, "h........h");
@@ -502,15 +502,24 @@ void lights(int rows, int cols) {
  for (int i = 0; i<rows; i++) {
   for (int j = 0; j<cols; j++) {
    if (mvinch(i,j) == 'L') {
-    STATE l = {i,j,0,0,0,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0}},0,0,0,0,0,0};
+    STATE l = {j,i,0,0,0,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0}},0,0,0,0,0,0};
     drawlight(&l, rows, cols);
    }
   }
  }
 }
 
-void bossLevel(int rows,int cols) {
+void bossLevel(int rows,int cols, MOB *mobs, int num_mobs) {
   reset_map(rows,cols);
+  for (int i=0; i<num_mobs; i++) {
+   mobs[i].x=0;
+   mobs[i].y=0;
+   mobs[i].hp=0;
+   mobs[i].atk=0;
+   mobs[i].def=0;
+   mobs[i].symbol=' ';
+   mobs[i].seen=FALSE;
+  }
   for (int i=0; i<rows; i++) {
    for (int j=0; j<cols; j++) {
     if (i != 0 && i != rows-1) {
@@ -537,7 +546,7 @@ void bossLevel(int rows,int cols) {
 }
 
 
-void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) {
+void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, MOB *mobs, int num_mobs) {
     
     int x = st->playerX;
     int y = st->playerY;
@@ -547,12 +556,12 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
         c = mvinch(x-1,y);
         if (c == 'S') {
            if (st->level < 5) {
-            gerarMundo(rows, cols);
+            gerarMundo(rows, cols, mobs, num_mobs, st);
             st->playerX=6; st->playerY=5;
             st->level++;
            }
           else {
-            bossLevel(rows, cols);
+            bossLevel(rows, cols, mobs, num_mobs);
             st->playerX=6; st->playerY=5;
             st->level++;            
           }
@@ -565,12 +574,12 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
         c = mvinch(x+1,y);
         if (c == 'S') {
           if (st->level < 5) {
-            gerarMundo(rows, cols);
+            gerarMundo(rows, cols, mobs, num_mobs, st);
             st->playerX=4; st->playerY=5;
             st->level++;
            }
           else {
-            bossLevel(rows, cols);
+            bossLevel(rows, cols, mobs, num_mobs);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
@@ -583,12 +592,12 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
         c = mvinch(x,y-1);
         if (c == 'S') {
           if (st->level < 5) {
-            gerarMundo(rows, cols);
+            gerarMundo(rows, cols, mobs, num_mobs, st);
             st->playerX=5; st->playerY=6;
             st->level++;
            }
           else {
-            bossLevel(rows, cols);
+            bossLevel(rows, cols, mobs, num_mobs);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
@@ -601,12 +610,12 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
         c = mvinch(x,y+1);
         if (c == 'S') {
           if (st->level < 5) {
-            gerarMundo(rows, cols);
+            gerarMundo(rows, cols, mobs, num_mobs, st);
             st->playerX=5; st->playerY=4;
             st->level++;
            }
           else {
-            bossLevel(rows, cols);
+            bossLevel(rows, cols, mobs, num_mobs);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
@@ -810,7 +819,7 @@ void itemPickUp(STATE *st, int i, MessageWindow* msg_window) {
 }
 
   // função principal da criação de mapas
-void gerarMundo(int templateRows, int templateCols) {
+void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STATE *st) {
     
     int i;
     
@@ -819,5 +828,19 @@ void gerarMundo(int templateRows, int templateCols) {
     for (i=0; i < N_MAXIMO_ITEMS; i++) {  // cria um certo número de items
     gerar_Random_item(templateRows, templateCols); // funções para adicionar itens
         }
+    	    // Inicializar mobs
+    for (int i = 0; i < num_mobs; i++) {
+        COORD coords = generateRandomCoords(templateRows, templateCols);
+        int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
+
+        if (probability < 50) {
+            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 8+2*st->level, 8+2*st->level, 8+2*st->level, '&', false};  // STUPID
+        } else if (probability < 80) {
+            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 13+2*st->level, 10+2*st->level, 6+2*st->level, '~', false};   // COWARD
+        } else {
+            mobs[i] = (MOB){"Wizard",coords.x, coords.y, 6+2*st->level, 6+2*st->level, 4+2*st->level, '$', false};     // SMART
+        }
+    }
+
 }
 

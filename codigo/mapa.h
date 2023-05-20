@@ -17,9 +17,11 @@ typedef struct STATE STATE;
 
 typedef struct MessageWindow MessageWindow;
 
+typedef struct MOB MOB;
 
+typedef struct COORD COORD;
 
-void gerarMundo(int templateRows, int templateCols);
+void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STATE *st);
 
 void drawlight(STATE *st, int r, int co);
 
@@ -27,7 +29,7 @@ int mapa_pode_andar (int x, int y);
 
 void endmap(STATE *st, int i, int rows, int cols);
 
-void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window);
+void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, MOB *mobs, int num_mobs);
 
 void gerar_Random_item(int templateRows, int templateCols);
 
