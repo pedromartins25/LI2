@@ -1,0 +1,71 @@
+void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy) {
+    int new_x = st->playerX + dx;
+    int new_y = st->playerY + dy;
+
+    // Verifica se há uma mob na nova posição
+    for (int i = 0; i < num_mobs; i++) {
+        MOB mob = mobs[i];
+        if (mob.x == new_x && mob.y == new_y) {
+            // O jogador ataca a mob
+            attack_mob(st, &mob);
+            // Verifica se a mob foi derrotada
+            if (mob.hp <= 0) {
+                // Remove a mob do jogo
+                remove_mob(mobs, &num_mobs, i);
+            }
+            break;
+        }
+    }
+
+    // Verifica se o jogador pode se mover
+    if (mapa_pode_andar(new_x, new_y)) {
+        st->playerX += dx;
+        st->playerY += dy;
+    }
+}
+
+// Função para atacar uma mob
+void attack_mob(STATE *st, MOB *mob) {
+    // Reduz a vida da mob com base no ataque do jogador
+    mob->hp -= st->playerAtk;
+}
+
+// Função para remover uma mob da lista de mobs
+void remove_mob(MOB *mobs, int *num_mobs, int index) {
+    // Move as mobs restantes para preencher o espaço da mob removida
+    for (int i = index; i < *num_mobs - 1; i++) {
+        mobs[i] = mobs[i + 1];
+    }
+    (*num_mobs)--;
+}
+
+
+
+case KEY_UP:
+case '8': 
+    endmap(st, 1, rows, cols);
+    nextlevel(st, 1, rows, cols, msg_window); 
+    itemPickUp(st, 1, msg_window); 
+    do_movement_action(st, mobs, num_mobs, -1, 0); 
+    drawlight(st, rows, cols); 
+    break;
+case KEY_DOWN:
+case '2': 
+    endmap(st, 2, rows, cols); 
+    nextlevel(st, 2, rows, cols, msg_window); 
+    itemPickUp(st, 2, msg_window); 
+    do_movement_action(st, mobs, num_mobs, 1, 0); 
+    drawlight(st, rows, cols); 
+    break;
+case KEY_LEFT:
+case '4': 
+    endmap(st, 3, rows, cols); 
+    nextlevel(st, 3, rows, cols, msg_window); 
+    itemPickUp(st, 3, msg_window); 
+    do_movement_action(st, mobs, num_mobs, 0, -1); 
+    drawlight(st, rows, cols); 
+    break;
+case KEY_RIGHT:
+case '6': 
+    endmap(st, 4, rows, cols);.
+
