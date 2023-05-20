@@ -306,7 +306,7 @@ void generate_map(int templateRows, int templateCols) {
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
-    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != '$') return 1;
+    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') return 1;
     return 0;
 }
 
@@ -704,7 +704,7 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
-  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != '$') {
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário

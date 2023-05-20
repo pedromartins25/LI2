@@ -207,28 +207,25 @@ void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, Mess
     }
 }
 
-
-// Função para atacar uma mob
 void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
-    // Reduz a vida da mob com base no ataque do jogador
     int dano;
     char message[100]; 
     dano = st->playerAtk - mob->def;
+
+    if (dano <= 0) dano = 1;
     mob->hp -= dano;
-    if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
-        snprintf(message, sizeof(message), "A mob foi derrotada.\n");
+
+    if (mob->hp <= 0) {
+        snprintf(message, sizeof(message), "%s foi derrotado.\n", mob->name);
         mob->hp = 0;
+    } else {
+        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano);
+        add_message(msg_window, message);
+
+        snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
     }
-    else {
-        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano); 
-    
-    // Adiciona a mensagem à janela de mensagens
+
     add_message(msg_window, message);
-       snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
-    
-    // Adiciona a mensagem à janela de mensagens
-    add_message(msg_window, message);
-   }
 }
 
 
@@ -446,7 +443,7 @@ void mobAttack(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
     // Cria uma mensagem com o dano causado pela mob
     char message[100];
-    snprintf(message, sizeof(message), "A mob causou %d de dano.", damage_to_player);
+    snprintf(message, sizeof(message), "%s causou %d de dano.", mob->name, damage_to_player);
 
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
@@ -468,7 +465,7 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
             // Verifica se o inimigo está adjacente ao jogador
             if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
                 mobAttack(st, &mobs[i], msg_window);
-                st->playerHp -= mobs[i].atk;
+                // st->playerHp -= st->playerDef - mobs[i].atk;
             } else {
                 // Caso contrário, move o inimigo aleatoriamente
                 int dx = rand() % 3 - 1;

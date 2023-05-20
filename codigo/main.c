@@ -12,9 +12,9 @@ int main() {
 	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
     MOB mobs[MAX_MOBS];
-    mobs[0] = (MOB){15, 15, 10, 10, 10, '&', false};  // STUPID 
-    mobs[1] = (MOB){20, 20, 15, 12, 8, '~', false};   // COWARD
-    mobs[2] = (MOB){10, 10, 8, 8, 6, '$', false};     // SMART  
+    mobs[0] = (MOB){"Stupid zombie",15, 15, 10, 10, 10, '&', false};  // STUPID 
+    mobs[1] = (MOB){"Coward snake", 20, 20, 15, 12, 8, '~', false};   // COWARD
+    mobs[2] = (MOB){"Wizard", 10, 10, 8, 8, 6, 'W', false};     // SMART  
     int num_mobs = 10;
 
 	WINDOW *wnd = initscr(); // inicializa a tela
@@ -65,11 +65,11 @@ int main() {
         int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
 
         if (probability < 50) {
-            mobs[i] = (MOB){coords.x, coords.y, 10, 10, 10, '&', false};  // STUPID
+            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 10, 12, 10, '&', false};  // STUPID
         } else if (probability < 80) {
-            mobs[i] = (MOB){coords.x, coords.y, 15, 12, 8, '~', false};   // COWARD
+            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 15, 14, 8, '~', false};   // COWARD
         } else {
-            mobs[i] = (MOB){coords.x, coords.y, 8, 8, 6, '$', false};     // SMART
+            mobs[i] = (MOB){"Wizard", coords.x, coords.y, 8, 18, 6, 'W', false};     // SMART
         }
     }
 
