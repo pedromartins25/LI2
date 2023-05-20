@@ -633,7 +633,7 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
-  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M') {
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != '&' && c != '~' && c != '$') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário
@@ -701,7 +701,7 @@ int i=0;
         break;
     }
    // Adicione uma mensagem à janela de mensagens
-   const char* message = "Item Apanhado!            ";
+   const char* message = "Item Apanhado!\n";
    add_message(msg_window, message);
    }
 }

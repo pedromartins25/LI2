@@ -175,18 +175,25 @@ void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, Mess
     int new_x = st->playerX + dx;
     int new_y = st->playerY + dy;
 
-    // Verifica se há uma mob na nova posição
+    // Procura a mob na nova posição
+    int mob_index = -1;
     for (int i = 0; i < num_mobs; i++) {
         MOB mob = mobs[i];
         if (mob.x == new_x && mob.y == new_y) {
-            // O jogador ataca a mob
-            attack_mob(st, &mob, msg_window);
-            // Verifica se a mob foi derrotada
-            if (mob.hp <= 0) {
-                // Remove a mob do jogo
-                remove_mob(mobs, &num_mobs, i);
-            }
+            mob_index = i;
             break;
+        }
+    }
+
+    // Se houver uma mob na nova posição, ataca a mob específica
+    if (mob_index != -1) {
+        MOB *mob = &mobs[mob_index];
+        attack_mob(st, mob, msg_window);
+
+        // Verifica se a mob foi derrotada
+        if (mob->hp <= 0) {
+            // Remove a mob do jogo
+            remove_mob(mobs, &num_mobs, mob_index);
         }
     }
 
@@ -197,17 +204,22 @@ void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, Mess
     }
 }
 
+
 // Função para atacar uma mob
 void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
     // Reduz a vida da mob com base no ataque do jogador
-    int dano; 
-    dano = st->playerAtk - mob -> def;
+    int dano;
+    char message[100]; 
+    dano = st->playerAtk - mob->def;
     mob->hp -= dano;
-
-    // Cria uma mensagem com o dano e a vida restante da mob
-    char message[100];
-    snprintf(message, sizeof(message), "Você causou %d de dano. Vida restante da mob: %d", dano, mob->hp);
-
+    if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
+        snprintf(message, sizeof(message), "A mob foi derrotada.\n");
+        mob->hp = 0;
+    }
+    else {
+        snprintf(message, sizeof(message), "Causaste %d de dano. Vida restante da mob: %d\n", dano, mob->hp); 
+    }
+    
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
 }
