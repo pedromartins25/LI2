@@ -173,7 +173,7 @@ void template10(int w, int k) {
 
 void template11(int w, int k) {
     
-    attron(COLOR_PAIR(2));
+    attron(COLOR_PAIR(1));
     mvprintw(w*10, k*10,   "hhhh..hhhh");
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
@@ -184,7 +184,7 @@ void template11(int w, int k) {
     mvprintw(w*10+7, k*10, "h........h");
     mvprintw(w*10+8, k*10, "h........h");
     mvprintw(w*10+9, k*10, "hhhh..hhhh");
-    attroff(COLOR_PAIR(2));
+    attroff(COLOR_PAIR(1));
 }
 
   // Restrem a criação de novas salas para o mapa ser compativel
@@ -306,7 +306,7 @@ void generate_map(int templateRows, int templateCols) {
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
-    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L') return 1;
+    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != '$') return 1;
     return 0;
 }
 
@@ -546,7 +546,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
         if (c == 'S') {
-           if (st->level < 2) {
+           if (st->level < 5) {
             gerarMundo(rows, cols);
             st->playerX=6; st->playerY=5;
             st->level++;
@@ -564,7 +564,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 2) {  // no caso de andar para baixo
         c = mvinch(x+1,y);
         if (c == 'S') {
-          if (st->level < 2) {
+          if (st->level < 5) {
             gerarMundo(rows, cols);
             st->playerX=4; st->playerY=5;
             st->level++;
@@ -582,7 +582,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 3) {  // no caso de andar para a esquerda
         c = mvinch(x,y-1);
         if (c == 'S') {
-          if (st->level < 2) {
+          if (st->level < 5) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=6;
             st->level++;
@@ -600,7 +600,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window) 
     if (i == 4) {  // no caso de andar para a direita
         c = mvinch(x,y+1);
         if (c == 'S') {
-          if (st->level < 2) {
+          if (st->level < 5) {
             gerarMundo(rows, cols);
             st->playerX=5; st->playerY=4;
             st->level++;
@@ -704,7 +704,7 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
-  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L') {
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != '$') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário

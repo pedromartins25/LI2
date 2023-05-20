@@ -10,18 +10,6 @@
 #include "mapa.h"
 
 
-
-void do_movement_action(STATE *st, int dx, int dy) {
-
-    int new_x = st->playerX + dx;
-    int new_y = st->playerY + dy;
-    
-    if (mapa_pode_andar(new_x, new_y)) {
-        st->playerX += dx;
-        st->playerY += dy;
- }
-}
-
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
 
     int key = getch();
@@ -42,7 +30,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 1, rows, cols);
             nextlevel(st, 1, rows, cols, msg_window); 
             itemPickUp(st, 1, msg_window); 
-            do_movement_action(st, -1, -1); 
+            do_movement_action(st, mobs, num_mobs,-1, -1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_UP:
@@ -50,7 +38,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 1, rows, cols);
             nextlevel(st, 1, rows, cols, msg_window); 
             itemPickUp(st, 1, msg_window); 
-            do_movement_action(st, -1, +0); 
+            do_movement_action(st, mobs, num_mobs,-1, +0, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_A3:
@@ -58,7 +46,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 1, rows, cols); 
             nextlevel(st, 1, rows, cols, msg_window); 
             itemPickUp(st, 1, msg_window); 
-            do_movement_action(st, -1, +1); 
+            do_movement_action(st, mobs, num_mobs,-1, +1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_LEFT:
@@ -66,7 +54,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 3, rows, cols); 
             nextlevel(st, 3, rows, cols, msg_window); 
             itemPickUp(st, 3, msg_window); 
-            do_movement_action(st, +0, -1); 
+            do_movement_action(st, mobs, num_mobs,+0, -1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_B2:
@@ -77,7 +65,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 4, rows, cols); 
             nextlevel(st, 4, rows, cols, msg_window); 
             itemPickUp(st, 4, msg_window); 
-            do_movement_action(st, +0, +1); 
+            do_movement_action(st, mobs, num_mobs,+0, +1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_C1:
@@ -85,7 +73,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 2, rows, cols); 
             nextlevel(st, 2, rows, cols, msg_window); 
             itemPickUp(st, 2, msg_window); 
-            do_movement_action(st, +1, -1); 
+            do_movement_action(st, mobs, num_mobs,+1, -1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_DOWN:
@@ -93,7 +81,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 2, rows, cols); 
             nextlevel(st, 2, rows, cols, msg_window); 
             itemPickUp(st, 2, msg_window); 
-            do_movement_action(st, +1, +0); 
+            do_movement_action(st, mobs, num_mobs,+1, +0, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case KEY_C3:
@@ -101,7 +89,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             endmap(st, 2, rows, cols); 
             nextlevel(st, 2, rows, cols, msg_window); 
             itemPickUp(st, 2, msg_window);
-            do_movement_action(st, +1, +1); 
+            do_movement_action(st, mobs, num_mobs,+1, +1, msg_window); 
             drawlight(st, rows, cols); 
             break;
         case 'q': 
@@ -119,50 +107,9 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
     }
 
 
-        // Atualiza o estado dos inimigos
-    for (int i = 0; i < num_mobs; i++) {
-    // Verifica se o inimigo está vivo
-        if (mobs[i].hp > 0) {
-        // Verifica se o inimigo está adjacente ao jogador
-        if (abs(mobs[i].x - st->playerX) <= 1 && abs(mobs[i].y - st->playerY) <= 1) {
-            mobAttack(st, &mobs[i]);
-            st->playerHp -= mobs[i].atk;
-        } else {
-            // Caso contrário, move o inimigo aleatoriamente
-            int dx = rand() % 3 - 1;
-            int dy = rand() % 3 - 1;
-            int new_x = mobs[i].x + dx;
-            int new_y = mobs[i].y + dy;
-
-            // Verifica se o novo local está dentro dos limites do mapa
-            if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
-                // Verifica se o novo local está dentro da distância permitida do jogador
-                if (abs(st->playerX - new_x) <= 1 && abs(st->playerY - new_y) <= 1) {
-                    attron(COLOR_PAIR(2));
-                    mvaddch(mobs[i].x, mobs[i].y, ' ');
-                    attroff(COLOR_PAIR(2));
-                } else if (mvinch(new_x, new_y) == '-') {
-                    attron(COLOR_PAIR(4));
-                    mvaddch(mobs[i].x, mobs[i].y, '-');
-                    attroff(COLOR_PAIR(4));
-                } else {
-                    attron(COLOR_PAIR(1));
-                    mvaddch(mobs[i].x, mobs[i].y, '.');
-                    attroff(COLOR_PAIR(1));
-                }
-
-                if (mapa_pode_andar(new_x, new_y)) {
-                    mobs[i].x = new_x;
-                    mobs[i].y = new_y;
-                }
-            }
-        }
-
-        // Renderiza o inimigo na tela
-        mvaddch(mobs[i].x, mobs[i].y, 'M');
-    }
-    }
-    }
+            // Atualiza o estado dos inimigos
+        update_enemy_states(st, mobs, num_mobs, rows, cols, msg_window); 
+}
     else {
        switch(key) {
         case 'q':  // fecha o jogo
@@ -225,6 +172,74 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             update_stats_window(stats_window, st);
 }
 
+
+
+void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, MessageWindow* msg_window) {
+    int new_x = st->playerX + dx;
+    int new_y = st->playerY + dy;
+
+    // Procura a mob na nova posição
+    int mob_index = -1;
+    for (int i = 0; i < num_mobs; i++) {
+        MOB mob = mobs[i];
+        if (mob.x == new_x && mob.y == new_y) {
+            mob_index = i;
+            break;
+        }
+    }
+
+    // Se houver uma mob na nova posição, ataca a mob específica
+    if (mob_index != -1) {
+        MOB *mob = &mobs[mob_index];
+        attack_mob(st, mob, msg_window);
+
+        // Verifica se a mob foi derrotada
+        if (mob->hp <= 0) {
+            // Remove a mob do jogo
+            remove_mob(mobs, &num_mobs, mob_index);
+        }
+    }
+
+    // Verifica se o jogador pode se mover
+    if (mapa_pode_andar(new_x, new_y)) {
+        st->playerX += dx;
+        st->playerY += dy;
+    }
+}
+
+
+// Função para atacar uma mob
+void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
+    // Reduz a vida da mob com base no ataque do jogador
+    int dano;
+    char message[100]; 
+    dano = st->playerAtk - mob->def;
+    mob->hp -= dano;
+    if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
+        snprintf(message, sizeof(message), "A mob foi derrotada.\n");
+        mob->hp = 0;
+    }
+    else {
+        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano); 
+    
+    // Adiciona a mensagem à janela de mensagens
+    add_message(msg_window, message);
+       snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
+    
+    // Adiciona a mensagem à janela de mensagens
+    add_message(msg_window, message);
+   }
+}
+
+
+// Função para remover uma mob da lista de mobs
+void remove_mob(MOB *mobs, int *num_mobs, int index) {
+    // Move as mobs restantes para preencher o espaço da mob removida
+    for (int i = index; i < *num_mobs - 1; i++) {
+        mobs[i] = mobs[i + 1];
+    }
+    (*num_mobs)--;
+}
 
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {
@@ -424,12 +439,170 @@ int i;
    add_message(msg_window, message);
 }
 
-void mobAttack(STATE *st, MOB *mob) {
+void mobAttack(STATE *st, MOB *mob, MessageWindow* msg_window) {
     int damage_to_player = mob->atk - st->playerDef;
     if (damage_to_player > 0) {
         st->playerHp -= damage_to_player;
+
+    // Cria uma mensagem com o dano causado pela mob
+    char message[100];
+    snprintf(message, sizeof(message), "A mob causou %d de dano.", damage_to_player);
+
+    // Adiciona a mensagem à janela de mensagens
+    add_message(msg_window, message);
+
     }
 }
+
+int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY) {
+    return abs(enemy->x - playerX) <= 1 && abs(enemy->y - playerY) <= 1;
+}
+
+
+
+
+void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window) {
+    for (int i = 0; i < num_mobs; i++) {
+        // Verifica se o inimigo está vivo
+        if (mobs[i].hp > 0) {
+            // Verifica se o inimigo está adjacente ao jogador
+            if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
+                mobAttack(st, &mobs[i], msg_window);
+                st->playerHp -= mobs[i].atk;
+            } else {
+                // Caso contrário, move o inimigo aleatoriamente
+                int dx = rand() % 3 - 1;
+                int dy = rand() % 3 - 1;
+                int new_x = mobs[i].x + dx;
+                int new_y = mobs[i].y + dy;
+
+                // Verifica se o novo local está dentro dos limites do mapa
+                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+                    // Apaga o caractere na posição anterior
+                    mvaddch(mobs[i].x, mobs[i].y, ' ');
+
+                    // Verifica se o novo local está dentro da distância permitida do jogador
+                    if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
+                        attron(COLOR_PAIR(2));
+                        mvaddch(mobs[i].x, mobs[i].y, ' ');
+                        attroff(COLOR_PAIR(2));
+                    } else if (mvinch(new_x, new_y) == '-') {
+                        attron(COLOR_PAIR(4));
+                        mvaddch(mobs[i].x, mobs[i].y, '-');
+                        attroff(COLOR_PAIR(4));
+                    } else {
+                        attron(COLOR_PAIR(1));
+                        mvaddch(mobs[i].x, mobs[i].y, '.');
+                        attroff(COLOR_PAIR(1));
+                    }
+
+                    if (mapa_pode_andar(new_x, new_y)) {
+                        mobs[i].x = new_x;
+                        mobs[i].y = new_y;
+                    }
+                }
+            }
+
+            // Renderiza o inimigo na tela
+            draw_mob(mobs[i], st->playerX, st->playerY);
+        }
+    }
+}
+
+void draw_mob(MOB mob, int playerX, int playerY) {
+    int distance = sqrt(pow(mob.x - playerX, 2) + pow(mob.y - playerY, 2));
+
+    if (distance <= 6) {
+        attron(COLOR_PAIR(18));  // mob visível - cor preta
+        mvaddch(mob.x, mob.y, mob.symbol);
+        attroff(COLOR_PAIR(18));
+        mob.seen = true; // Marca a MOB como vista
+    } else if (mob.seen) {
+        attron(COLOR_PAIR(4));  // mob não visível, mas já foi vista - cor cinza
+        mvaddch(mob.x, mob.y, mob.symbol);
+        attroff(COLOR_PAIR(4));
+    } else {
+        attron(COLOR_PAIR(17));  // mob não visível e nunca foi vista - cor branca
+        mvaddch(mob.x, mob.y, mob.symbol);
+        attroff(COLOR_PAIR(17));
+    }
+}
+
+
+COORD generateRandomCoords(int rows, int cols) {
+    COORD coords;
+    coords.x = rand() % rows;
+    coords.y = rand() % cols;
+    return coords;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void gameOver() {
     clear();  // Limpa a tela
@@ -460,4 +633,5 @@ void gameOver() {
     endwin();
     exit(0);  // Encerra o programa
 }
+
 

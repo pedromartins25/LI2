@@ -217,11 +217,15 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
         mob->hp = 0;
     }
     else {
-        snprintf(message, sizeof(message), "Causaste %d de dano. Vida restante da mob: %d\n", dano, mob->hp); 
-    }
+        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano); 
     
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
+       snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
+    
+    // Adiciona a mensagem à janela de mensagens
+    add_message(msg_window, message);
+   }
 }
 
 

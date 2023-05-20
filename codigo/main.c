@@ -11,8 +11,11 @@
 int main() {
 	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
-	MOB mob = {15,15,10,10,10,'M'};
-	int num_mobs = 10;
+    MOB mobs[MAX_MOBS];
+    mobs[0] = (MOB){15, 15, 10, 10, 10, '&', false};  // STUPID 
+    mobs[1] = (MOB){20, 20, 15, 12, 8, '~', false};   // COWARD
+    mobs[2] = (MOB){10, 10, 8, 8, 6, '$', false};     // SMART  
+    int num_mobs = 10;
 
 	WINDOW *wnd = initscr(); // inicializa a tela
 	int ncols, nrows, templateRows, templateCols;
@@ -49,11 +52,26 @@ int main() {
         init_pair(15,COLOR_BLUE, COLOR_BLACK);
         init_pair(16,COLOR_BLACK, COLOR_RED);
         init_pair(17,COLOR_BLUE, FLOOR); // player color
+        init_pair(18, COLOR_BLACK, FLOOR); // player color
 
 	gerarMundo(templateRows, templateCols);
 	drawlight(&st, templateRows, templateCols);
 
 	    // inicializa a tela do ncurses
+
+	    // Inicializar mobs
+    for (int i = 0; i < num_mobs; i++) {
+        COORD coords = generateRandomCoords(templateRows, templateCols);
+        int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
+
+        if (probability < 50) {
+            mobs[i] = (MOB){coords.x, coords.y, 10, 10, 10, '&', false};  // STUPID
+        } else if (probability < 80) {
+            mobs[i] = (MOB){coords.x, coords.y, 15, 12, 8, '~', false};   // COWARD
+        } else {
+            mobs[i] = (MOB){coords.x, coords.y, 8, 8, 6, '$', false};     // SMART
+        }
+    }
 
     // cria a janela de stats
     int stats_height = 5;
@@ -69,6 +87,25 @@ int main() {
     MessageWindow msg_window;
     init_message_window(&msg_window);
 
+  
+  
+   // Adicione uma mensagem à janela de mensagens
+   const char* message1 = "Mover: use as setas/numpad";
+   add_message(&msg_window, message1);
+   const char* message2 = "Inventário: M             ";
+   add_message(&msg_window, message2);
+   const char* message3 = "Setas para scroll         ";
+   add_message(&msg_window, message3);
+   const char* message4 = "Equipar: E                ";
+   add_message(&msg_window, message4);
+   const char* message5 = "Dano: mover contra mobs   ";
+   add_message(&msg_window, message5);
+   const char* message6 = "Tente chegar ao Boss      ";                        
+   add_message(&msg_window, message6);
+
+
+
+
 	while(1) {
 		move(nrows - 1, 0);
 		attron(COLOR_PAIR(15));
@@ -78,7 +115,7 @@ int main() {
 		mvaddch(st.playerX, st.playerY, '@' | A_BOLD);
 		attroff(COLOR_PAIR(17));
 		move(st.playerX, st.playerY);
-		update(&st, &mob, num_mobs, templateRows, templateCols, stats_window, 
+		update(&st, mobs, num_mobs, templateRows, templateCols, stats_window, 
 		&msg_window, ncols);
 
         draw_message_window(msg_wnd, &msg_window, 0, 0);
