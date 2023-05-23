@@ -551,6 +551,9 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
     int x = st->playerX;
     int y = st->playerY;
     char c;
+    char message[100];
+
+
 
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
@@ -565,9 +568,8 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->playerX=6; st->playerY=5;
             st->level++;            
           }
-        // Adicione uma mensagem à janela de mensagens
-        const char* message = "Subiu de nível!           ";
-        add_message(msg_window, message);
+        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);
+        add_message(msg_window, message);            
         }
     }
     if (i == 2) {  // no caso de andar para baixo
@@ -584,7 +586,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++; 
            } 
         // Adicione uma mensagem à janela de mensagens
-        const char* message = "Subiu de nível!           ";
+        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);
         add_message(msg_window, message);            
         }
     }
@@ -602,7 +604,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++; 
            } 
         // Adicione uma mensagem à janela de mensagens
-        const char* message = "Subiu de nível!           ";
+        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);
         add_message(msg_window, message);            
         }
     }
@@ -620,7 +622,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++; 
            } 
         // Adicione uma mensagem à janela de mensagens
-        const char* message = "Subiu de nível!           ";
+        const char* message = "Subiu de nível!           "; 
         add_message(msg_window, message);            
         }
     }
@@ -713,6 +715,7 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
+char message[100];
   if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') {
     switch(c) {
     case '!': 
@@ -787,7 +790,7 @@ int i=0;
         break;
     }
    // Adicione uma mensagem à janela de mensagens
-   const char* message = "Item Apanhado!            ";
+   snprintf(message, sizeof(message), "Item apanhado.\n"); // // TAREFA, tentar adicionar nome do item na mensagem. Criar array char messagem[100] e utilizar o snprintf, não consegui aceder ao nome do item.
    add_message(msg_window, message);
    }
 }
@@ -834,11 +837,11 @@ void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STA
         int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
 
         if (probability < 50) {
-            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 8+2*st->level, 8+2*st->level, 8+2*st->level, '&', false};  // STUPID
+            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 12+2*st->level, 12+2*st->level, 12+2*st->level, '&', false};  // STUPID
         } else if (probability < 80) {
-            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 13+2*st->level, 10+2*st->level, 6+2*st->level, '~', false};   // COWARD
+            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 10+2*st->level, 10+2*st->level, 8+2*st->level, '~', false};   // COWARD
         } else {
-            mobs[i] = (MOB){"Wizard",coords.x, coords.y, 6+2*st->level, 6+2*st->level, 4+2*st->level, '$', false};     // SMART
+            mobs[i] = (MOB){"Wizard",coords.x, coords.y, 12+2*st->level, 14+2*st->level, 10+2*st->level, 'W', false};     // SMART
         }
     }
 

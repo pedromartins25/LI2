@@ -4,17 +4,21 @@
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
 #include "state.h"
-#include "mapa.h"
+#include "mapa.h" 
+
+
 
 int main() {
 	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
     MOB mobs[MAX_MOBS];
-    mobs[0] = (MOB){"Stupid zombie",15, 15, 10, 10, 10, '&', false};  // STUPID 
-    mobs[1] = (MOB){"Coward snake", 20, 20, 15, 12, 8, '~', false};   // COWARD
-    mobs[2] = (MOB){"Wizard", 10, 10, 8, 8, 6, 'W', false};     // SMART  
+    mobs[0] = (MOB){"Stupid zombie",15, 15, 12, 12, 12, '&', false}; //name, posx, posy, hp, atk, def, symbol, seen; STUPID 
+    mobs[1] = (MOB){"Coward snake", 20, 20, 10, 10, 8, '~', false};   // COWARD
+    mobs[2] = (MOB){"Wizard", 10, 10, 12, 14, 10, 'W', false};     // SMART  
     int num_mobs = 10;
 
 	WINDOW *wnd = initscr(); // inicializa a tela
@@ -53,6 +57,7 @@ int main() {
         init_pair(16,COLOR_BLACK, COLOR_RED);
         init_pair(17,COLOR_BLUE, FLOOR); // player color
         init_pair(18, COLOR_BLACK, FLOOR); // player color
+        init_pair(19, COLOR_RED, COLOR_BLACK); // MENSAGENS A VERMELHO
 
 	gerarMundo(templateRows, templateCols, mobs, num_mobs, &st);
 	drawlight(&st, templateRows, templateCols);
@@ -101,14 +106,10 @@ int main() {
 		mvaddch(st.playerX, st.playerY, '@' | A_BOLD);
 		attroff(COLOR_PAIR(17));
 		move(st.playerX, st.playerY);
-		update(&st, mobs, num_mobs, templateRows, templateCols, stats_window, 
-		&msg_window, ncols);
-
-        draw_message_window(msg_wnd, &msg_window, 0, 0);
+		update(&st, mobs, num_mobs, templateRows, templateCols, stats_window, &msg_window, ncols);
+		draw_message_window(msg_wnd, &msg_window, 0, 0);
         lights(templateRows, templateCols);
-
-		        // atualiza a janela de stats
-        update_stats_window(stats_window, &st);
+        update_stats_window(stats_window, &st); // atualiza a janela de stats
         if (st.playerHp <=0) gameOver();
 	}
     // limpa a janela de stats e encerra o ncurses

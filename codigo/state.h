@@ -77,18 +77,21 @@ void add_message(MessageWindow* msg_window, const char* message);
 void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col);
 void dropItem(STATE *st, MessageWindow* msg_window);
 
-COORD generateRandomCoords(int rows, int cols);
+
 
 
 //COMBATE
 int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY);
 void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window);
-void mobAttack(STATE *st, MOB *mob, MessageWindow* msg_window);
+void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window);
 void draw_mob(MOB mob, int playerX, int playerY);
 
 void remove_mob(MOB *mobs, int *num_mobs, int index);
 void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window);
+COORD generateRandomCoords(int rows, int cols); // coordenadas aleatórias mobs
 
+
+void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols);
 
 void gameOver();
 #endif

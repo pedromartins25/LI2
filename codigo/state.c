@@ -5,9 +5,15 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
 #include "state.h"
 #include "mapa.h"
+
+// Variáveis globais para controlar o temporizador
+time_t start_time;
+double timer_duration = 1.0; // 1 segundo
 
 
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
@@ -214,21 +220,25 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
     int dano;
     char message[100]; 
     dano = st->playerAtk - mob->def;
+
+    if (dano <= 1){
+        dano = 1 ;
+        snprintf(message, sizeof(message), "Ainda estás muito fraco, causaste 1 de dano.");
+    }
+
     mob->hp -= dano;
     if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
-        snprintf(message, sizeof(message), "A mob foi derrotada.\n");
+        snprintf(message, sizeof(message), "%s foi derrotado.\n", mob->name);
         mob->hp = 0;
+
     }
+
     else {
-        snprintf(message, sizeof(message), "Causaste %d de dano.\n", dano); 
+        snprintf(message, sizeof(message), "Causaste %d de dano. Vida restante de %s: %d\n", dano, mob->name, mob->hp); 
     
-    // Adiciona a mensagem à janela de mensagens
-    add_message(msg_window, message);
-       snprintf(message, sizeof(message), "Vida restante da mob: %d\n", mob->hp);
-    
-    // Adiciona a mensagem à janela de mensagens
-    add_message(msg_window, message);
    }
+
+   add_message(msg_window, message);
 }
 
 
@@ -439,14 +449,14 @@ int i;
    add_message(msg_window, message);
 }
 
-void mobAttack(STATE *st, MOB *mob, MessageWindow* msg_window) {
+void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) {
     int damage_to_player = mob->atk - st->playerDef;
     if (damage_to_player > 0) {
         st->playerHp -= damage_to_player;
 
     // Cria uma mensagem com o dano causado pela mob
     char message[100];
-    snprintf(message, sizeof(message), "A mob causou %d de dano.", damage_to_player);
+    snprintf(message, sizeof(message), "%s causou %d de dano.", mob-> name,damage_to_player);
 
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
@@ -462,14 +472,20 @@ int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY) {
 
 
 void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window) {
+
     for (int i = 0; i < num_mobs; i++) {
         // Verifica se o inimigo está vivo
         if (mobs[i].hp > 0) {
             // Verifica se o inimigo está adjacente ao jogador
             if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
-                mobAttack(st, &mobs[i], msg_window);
-                // st->playerHp -= mobs[i].atk;
-            } else {
+                player_attack(st, &mobs[i], msg_window);
+            }
+
+            else if ((abs(mobs[i].x - st-> playerX) <= 3 && abs(mobs[i].y - st-> playerY) <= 3) && (mobs[i].symbol == '&')) {
+                 zombie_persegue(st, &mobs[i], rows, cols);
+             }  
+
+            else {
                 // Caso contrário, move o inimigo aleatoriamente
                 int dx = rand() % 3 - 1;
                 int dy = rand() % 3 - 1;
@@ -509,6 +525,7 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
     }
 }
 
+
 void draw_mob(MOB mob, int playerX, int playerY) {
     int distance = sqrt(pow(mob.x - playerX, 2) + pow(mob.y - playerY, 2));
 
@@ -542,23 +559,50 @@ COORD generateRandomCoords(int rows, int cols) {
 }
 
 
+void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
+    // Calcula a direção na qual o inimigo deve se mover para perseguir o jogador
+    int dx = 0, dy = 0;
+    if (st->playerX < zombie->x) {
+        dx = -1; // Move para a esquerda
+    } else if (st->playerX > zombie->x) {
+        dx = 1; // Move para a direita
+    }
+    if (st->playerY < zombie->y) {
+        dy = -1; // Move para cima
+    } else if (st->playerY > zombie->y) {
+        dy = 1; // Move para baixo
+    }
 
+    // Calcula as novas coordenadas do inimigo
+    int new_x = zombie->x + dx;
+    int new_y = zombie->y + dy;
 
+    // Verifica se o novo local está dentro dos limites do mapa
+    if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+        // Apaga o caractere na posição anterior
+        mvaddch(zombie->x, zombie->y, ' ');
 
+        // Verifica se o novo local está dentro da distância permitida do jogador
+        if (is_enemy_adjacent_to_player(zombie, st->playerX, st->playerY)) {
+            attron(COLOR_PAIR(2));
+            mvaddch(zombie->x, zombie->y, ' ');
+            attroff(COLOR_PAIR(2));
+        } else if (mvinch(new_x, new_y) == '-') {
+            attron(COLOR_PAIR(4));
+            mvaddch(zombie->x, zombie->y, '-');
+            attroff(COLOR_PAIR(4));
+        } else {
+            attron(COLOR_PAIR(1));
+            mvaddch(zombie->x, zombie->y, '.');
+            attroff(COLOR_PAIR(1));
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if (mapa_pode_andar(new_x, new_y)) {
+            zombie->x = new_x;
+            zombie->y = new_y;
+        }
+    }
+}
 
 
 
