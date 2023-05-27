@@ -106,7 +106,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
                 st->playerHp = 100;
             }
             do_movement_action(st, mobs, num_mobs,0, 0, msg_window);
-            snprintf(message, sizeof(message), "Regeneraste 1 de vida ao descansar.                 ");
+            snprintf(message, sizeof(message), "Regeneraste 1 de vida ao descansar.       ");
             
         }
         else snprintf(message, sizeof(message), "Não consegues regenerar mais      ");
@@ -117,7 +117,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             exit(0); 
             break;
         case 'm':  // abre o inventario e pausa o jogo
-            printInventory(st->inv, inv_window, st->n=0, st->m=8);
+            printInventory(st->inv, inv_window, st->n=0, st->m=7);
             printEquip(st->equip, 3, equip_window);
             st->menu=1;
             mvwprintw(inv_window,3, 1, ">");
@@ -255,13 +255,14 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
     }
 
     else {
-        snprintf(message, sizeof(message), "Causaste %d de dano. Vida restante de %s: %d\n", dano, mob->name, mob->hp); 
+        snprintf(message, sizeof(message), "Causaste %d de dano             ", dano); 
     
    }
 
    add_message(msg_window, message);
+   snprintf(message, sizeof(message), "Hp de %s: %d\n        ", mob->name, mob->hp); 
+   add_message(msg_window, message);
 }
-
 
 // Função para remover uma mob da lista de mobs
 void remove_mob(MOB *mobs, int *num_mobs, int index) {

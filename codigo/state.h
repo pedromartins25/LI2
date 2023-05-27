@@ -17,7 +17,7 @@
 
 #define MAX_INVENTORY_SIZE 20 // Tamanho máximo do inventário
 
-#define MAX_MESSAGES 8 // Máximo de mensagens na janela
+#define MAX_MESSAGES 7 // Máximo de mensagens na janela
 
 typedef struct {
     char name[20];

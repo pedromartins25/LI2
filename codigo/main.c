@@ -37,13 +37,13 @@ int main() {
 	
  	if (nrows>=32 && ncols >=111) {
            // inicialização das cores e os pairs necessários
-        init_color(STATS, 100,200,700);
+       init_color(STATS, 15,200,700);
         init_color(DARKFLOOR,250,250,250);
         init_color(DARKWALL,100,100,100);
         init_color(WALL,200,200,200);
         init_color(FLOOR,500,500,500);
         init_color(55,500,250,0);
-	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
         init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
         init_pair(COLOR_BLUE, COLOR_BLUE, 14);
         init_pair(STATS,COLOR_BLACK,STATS);
@@ -57,21 +57,16 @@ int main() {
         init_pair(16,COLOR_BLACK, COLOR_RED);
         init_pair(17,COLOR_BLUE, FLOOR); // player color
         init_pair(18, COLOR_BLACK, FLOOR); // player color
-        init_pair(19, COLOR_RED, COLOR_BLACK); // MENSAGENS A VERMELHO
+        init_pair(19, COLOR_WHITE, COLOR_RED); // HP
+        init_pair(20, COLOR_WHITE, COLOR_YELLOW); // DEF
+        init_pair(21, COLOR_WHITE, COLOR_GREEN); // ATK
+
 
 	gerarMundo(templateRows, templateCols, mobs, num_mobs, &st);
 	drawlight(&st, templateRows, templateCols);
 
-	    // inicializa a tela do ncurses
-
     // cria a janela de stats
-    int stats_height = 5;
-    int stats_width = 10;
-    int stats_y = 0;
-    int stats_x = ncols - stats_width;
-    WINDOW *stats_window = newwin(stats_height, stats_width, stats_y, stats_x);
-
-
+    WINDOW *stats_window = newwin(10, 5, templateRows+1, 0);
 
     // cria a janela de mensagens
     WINDOW* msg_wnd = newwin(10, ncols/3-2, templateRows+1 , 5);  // Define as dimensões da janela de mensagens
@@ -91,7 +86,7 @@ int main() {
    add_message(&msg_window, message4);
    const char* message5 = "Dano: mover contra mobs   ";
    add_message(&msg_window, message5);
-   const char* message6 = "Regeneração:r             ";
+   const char* message6 = "REST : E para regenerar   ";
    add_message(&msg_window, message6);
    const char* message7 = "Tente chegar ao Boss      ";                        
    add_message(&msg_window, message7);
