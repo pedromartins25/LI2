@@ -16,9 +16,9 @@ int main() {
 	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
     MOB mobs[MAX_MOBS];
-    mobs[0] = (MOB){"Stupid zombie",15, 15, 12, 12, 12, '&', false}; //name, posx, posy, hp, atk, def, symbol, seen; STUPID 
-    mobs[1] = (MOB){"Coward snake", 20, 20, 10, 10, 8, '~', false};   // COWARD
-    mobs[2] = (MOB){"Wizard", 10, 10, 12, 14, 10, 'W', false};     // SMART  
+    mobs[0] = (MOB){"Stupid zombie",15, 15, 12, 12, 12, '&', false, true}; //name, posx, posy, hp, atk, def, symbol, seen; STUPID 
+    mobs[1] = (MOB){"Coward snake", 20, 20, 10, 10, 8, '~', false, true};   // COWARD
+    mobs[2] = (MOB){"Wizard", 10, 10, 12, 14, 10, 'W', false, true};     // SMART  
     int num_mobs = 10;
 
 	WINDOW *wnd = initscr(); // inicializa a tela
@@ -29,7 +29,7 @@ int main() {
 	srand(time(NULL));
 	start_color(); // Inicializa a biblioteca de cores do ncurse
 	curs_set(0);
-	cbreak();
+	halfdelay(5);
 	noecho();
 	nonl();
 	intrflush(stdscr, false);
@@ -91,8 +91,10 @@ int main() {
    add_message(&msg_window, message4);
    const char* message5 = "Dano: mover contra mobs   ";
    add_message(&msg_window, message5);
-   const char* message6 = "Tente chegar ao Boss      ";                        
+   const char* message6 = "Regeneração:r             ";
    add_message(&msg_window, message6);
+   const char* message7 = "Tente chegar ao Boss      ";                        
+   add_message(&msg_window, message7);
 
 
 

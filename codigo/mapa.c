@@ -34,7 +34,7 @@ void template2(int w, int k) {
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
     mvprintw(w*10+3, k*10, "h........h");
-    mvprintw(w*10+4, k*10, ".....s....");
+    mvprintw(w*10+4, k*10, "..........");
     mvprintw(w*10+5, k*10, "..........");
     mvprintw(w*10+6, k*10, "h........h");
     mvprintw(w*10+7, k*10, "h........h");
@@ -331,7 +331,7 @@ if (c=='L') {
     attroff(COLOR_PAIR(6));
 }
 else {
- if(c=='!'||c=='|'||c=='D'||c=='I'||c=='F'||c=='*'||c=='G'||c=='A'||c=='C') {
+ if(c=='!'||c=='|'||c=='D'||c=='I'||c=='F'||c=='*'||c=='G'||c=='A'||c=='C' ||c=='%' ||c=='#') {
     attron(COLOR_PAIR(4));
     mvaddch(j,i,c);
     attroff(COLOR_PAIR(4));
@@ -837,11 +837,11 @@ void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STA
         int probability = rand() % 100;  // Gera uma probabilidade entre 0 e 99
 
         if (probability < 50) {
-            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 12+2*st->level, 12+2*st->level, 12+2*st->level, '&', false};  // STUPID
+            mobs[i] = (MOB){"Stupid zombie",coords.x, coords.y, 12+2*st->level, 12+2*st->level, 12+2*st->level, '&', false, true};  // STUPID
         } else if (probability < 80) {
-            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 10+2*st->level, 10+2*st->level, 8+2*st->level, '~', false};   // COWARD
+            mobs[i] = (MOB){"Coward snake",coords.x, coords.y, 10+2*st->level, 10+2*st->level, 8+2*st->level, '~', false, true};   // COWARD
         } else {
-            mobs[i] = (MOB){"Wizard",coords.x, coords.y, 12+2*st->level, 14+2*st->level, 10+2*st->level, 'W', false};     // SMART
+            mobs[i] = (MOB){"Wizard",coords.x, coords.y, 12+2*st->level, 14+2*st->level, 10+2*st->level, 'W', false, true};     // SMART
         }
     }
 

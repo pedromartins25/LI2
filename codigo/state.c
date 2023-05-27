@@ -108,10 +108,10 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
                 st->playerHp = 100;
             }
             do_movement_action(st, mobs, num_mobs,0, 0, msg_window);
-            snprintf(message, sizeof(message), "Regeneraste um de vida ao descansar.                 ");
+            snprintf(message, sizeof(message), "Regeneraste 1 de vida ao descansar.                 ");
             add_message(msg_window, message);
         }
-        else snprintf(message, sizeof(message), "Descansaste mas não foi regenerada qualquer vida");
+        else snprintf(message, sizeof(message), "Não consegues regenerar mais      ");
         add_message(msg_window,message);
             break;
         case 'q': 
@@ -126,6 +126,9 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             st->equipPos = 3;
             wrefresh(inv_window);
             break;
+        case ERR:
+          update_enemy_states(st, mobs, num_mobs, rows, cols, msg_window); 
+          break;
     }
 
 
@@ -260,6 +263,9 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
 // Função para remover uma mob da lista de mobs
 void remove_mob(MOB *mobs, int *num_mobs, int index) {
+        attron(COLOR_PAIR(2));
+        mvaddch(mobs[index].x, mobs[index].y, ' ');
+        attroff(COLOR_PAIR(2));  
     // Move as mobs restantes para preencher o espaço da mob removida
     for (int i = index; i < *num_mobs - 1; i++) {
         mobs[i] = mobs[i + 1];
@@ -490,6 +496,9 @@ int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY) {
 void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window) {
 
     for (int i = 0; i < num_mobs; i++) {
+                int px = mobs[i].x;
+                int py = mobs[i].y;
+                int n = 0;
         // Verifica se o inimigo está vivo
         if (mobs[i].hp > 0) {
             // Verifica se o inimigo está adjacente ao jogador
@@ -507,26 +516,18 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
                 int dy = rand() % 3 - 1;
                 int new_x = mobs[i].x + dx;
                 int new_y = mobs[i].y + dy;
-
+                
+                char c = mvinch(new_x,new_y);
                 // Verifica se o novo local está dentro dos limites do mapa
-                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
-                    // Apaga o caractere na posição anterior
-                    mvaddch(mobs[i].x, mobs[i].y, ' ');
+                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols && mapa_pode_andar(new_x, new_y)) {
+                   if (c=='.' || c=='h') {n = 1; mobs[i].dark = true;}
+                   else if (c=='-' || c=='+') {n = 2; mobs[i].dark = false;}
+                       else if (c==' ' || c=='H') {n = 3; mobs[i].seen = true;}// Marca a MOB como vista
+                  
+                draw_prevMob(px,py,n);
+                   
 
                     // Verifica se o novo local está dentro da distância permitida do jogador
-                    if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
-                        attron(COLOR_PAIR(2));
-                        mvaddch(mobs[i].x, mobs[i].y, ' ');
-                        attroff(COLOR_PAIR(2));
-                    } else if (mvinch(new_x, new_y) == '-') {
-                        attron(COLOR_PAIR(4));
-                        mvaddch(mobs[i].x, mobs[i].y, '-');
-                        attroff(COLOR_PAIR(4));
-                    } else {
-                        attron(COLOR_PAIR(1));
-                        mvaddch(mobs[i].x, mobs[i].y, '.');
-                        attroff(COLOR_PAIR(1));
-                    }
 
                     if (mapa_pode_andar(new_x, new_y)) {
                         mobs[i].x = new_x;
@@ -541,6 +542,25 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
     }
 }
 
+void draw_prevMob(int x, int y, int n) {
+  if (n == 1) {
+        attron(COLOR_PAIR(1)); 
+        mvaddch(x, y, '.');  
+        attroff(COLOR_PAIR(1)); 
+  }
+  else if (n == 2) {
+        attron(COLOR_PAIR(4));
+        mvaddch(x, y, '-');
+        attroff(COLOR_PAIR(4));  
+  }
+  else {
+       if (n==3) {
+        attron(COLOR_PAIR(2));
+        mvaddch(x, y, ' ');
+        attroff(COLOR_PAIR(2));  
+       }
+  }
+}
 
 void draw_mob(MOB mob, int playerX, int playerY) {
     int distance = sqrt(pow(mob.x - playerX, 2) + pow(mob.y - playerY, 2));
@@ -549,16 +569,24 @@ void draw_mob(MOB mob, int playerX, int playerY) {
         attron(COLOR_PAIR(18));  // mob visível - cor preta
         mvaddch(mob.x, mob.y, mob.symbol);
         attroff(COLOR_PAIR(18));
-        mob.seen = true; // Marca a MOB como vista
-    } else if (mob.seen) {
+    } else {
+     if (mob.seen == true && mob.dark == false) {
         attron(COLOR_PAIR(4));  // mob não visível, mas já foi vista - cor cinza
         mvaddch(mob.x, mob.y, mob.symbol);
         attroff(COLOR_PAIR(4));
     } else {
-        attron(COLOR_PAIR(17));  // mob não visível e nunca foi vista - cor branca
+       if (mob.dark == true) {
+        attron(COLOR_PAIR(1));  // mob não visível e nunca foi vista - cor preta
         mvaddch(mob.x, mob.y, mob.symbol);
-        attroff(COLOR_PAIR(17));
+        attroff(COLOR_PAIR(1));
+       }
+       else {
+        attron(COLOR_PAIR(6));  
+        mvaddch(mob.x, mob.y, mob.symbol);
+        attroff(COLOR_PAIR(6));       
+       }
     }
+   }
 }
 
 
@@ -622,8 +650,8 @@ void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
 
 void rest(STATE *st) {
     st->playerHp += 1; // Incrementa a vida do jogador
-    if (st->playerHp > 100) {
-        st->playerHp = 100; // Limita a vida máxima do jogador
+    if (st->playerHp > 100+st->equip[2].stat) {
+        st->playerHp = 100+st->equip[2].stat; // Limita a vida máxima do jogador
     }
 
     // Atualiza a tela ou qualquer outra ação necessária durante o descanso

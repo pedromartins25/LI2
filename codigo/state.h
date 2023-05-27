@@ -42,6 +42,7 @@ typedef struct MOB {
     int def;
     char symbol;
     bool seen;
+    bool dark;
 } MOB;
 
 typedef struct STATE {
@@ -85,6 +86,7 @@ int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY);
 void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window);
 void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window);
 void draw_mob(MOB mob, int playerX, int playerY);
+void draw_prevMob(int x, int y, int n);
 
 void remove_mob(MOB *mobs, int *num_mobs, int index);
 void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window);
