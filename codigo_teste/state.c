@@ -337,7 +337,7 @@ Item temp;
    add_message(msg_window, message);
   }
   else {
-   if (st->inv[st->equipPos-3].type == 7) {
+   if (st->inv[st->equipPos-3].type == 7 && st->inv[st->equipPos-3].quantity > 0) {
     if (st->playerHp + st->inv[st->equipPos-3].stat >= 100+st->equip[2].stat) {
      st->playerHp = 100+st->equip[2].stat;
     }

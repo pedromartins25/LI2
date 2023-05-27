@@ -716,81 +716,97 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
 void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
 int i=0;
 char message[100];
+char name[100];
   if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário
+        strcpy(name,st->inv[st->len].name);
         st->len++; 
         break;
     case '|': 
         st->inv[st->len]=createItem(items[1], st->level); 
+        strcpy(name,st->inv[st->len].name);
         st->len++; 
         break;
     case 'D':  
         i = exists(items[3], st->len, st->inv);  // devolve a posição do item
         if (i != 0) {  // verifica se o item já existe
+        strcpy(name,st->inv[i].name);
         st->inv[i].quantity++;  // aumenta a quantidade do item
         }
         else {
         st->inv[st->len]=items[3];
+        strcpy(name,st->inv[st->len].name);
         st->len++;
         } 
         break;
     case 'I': 
         i = exists(items[4], st->len, st->inv);
         if (i != 0) {
+        strcpy(name,st->inv[i].name);
         st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[4];
+        strcpy(name,st->inv[st->len].name);
         st->len++;
         } 
         break;
     case 'F':  
         i = exists(items[5], st->len, st->inv);
         if (i != 0) {
+        strcpy(name,st->inv[i].name);
         st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[5];
+        strcpy(name,st->inv[st->len].name);
         st->len++;
         }  
         break;
     case '*': 
         i = exists(items[6], st->len, st->inv);
         if (i != 0) {
+        strcpy(name,st->inv[i].name);
         st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[6];
+        strcpy(name,st->inv[st->len].name);
         st->len++;
         }   
         break;
     case '#': 
         i = exists(items[7], st->len, st->inv);
         if (i != 0) {
+        strcpy(name,st->inv[i].name);
         st->inv[i].quantity++;
         }
         else {
         st->inv[st->len]=items[7];
+        strcpy(name,st->inv[st->len].name);
         st->len++;
         } 
         break;
     case '%':
-        st->inv[st->len]=createItem(items[2], st->level);  
+        st->inv[st->len]=createItem(items[2], st->level);
+        strcpy(name,st->inv[st->len].name);  
         st->len++; 
         break;
     case 'A':  
         st->inv[st->len]=createItem(items[8], st->level); 
+        strcpy(name,st->inv[st->len].name);
         st->len++; 
         break;
     case 'C': 
         st->inv[st->len]=createItem(items[9], st->level); 
+        strcpy(name,st->inv[st->len].name);
         st->len++; 
         break;
     }
    // Adicione uma mensagem à janela de mensagens
-   snprintf(message, sizeof(message), "Item apanhado.\n"); // TAREFA, tentar adicionar nome do item na mensagem. Criar array char messagem[100] e utilizar o snprintf, não consegui aceder ao nome do item.
+   snprintf(message, sizeof(message), "%s apanhado.\n", name); 
    add_message(msg_window, message);
    }
 }
