@@ -11,10 +11,7 @@
 #include "state.h"
 #include "mapa.h"
 
-// Variáveis globais para controlar o temporizador
-time_t start_time;
-double timer_duration = 1.0; // 1 segundo
-bool isRegenerating = false;
+
 char message[100]; 
 
 
@@ -110,7 +107,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             }
             do_movement_action(st, mobs, num_mobs,0, 0, msg_window);
             snprintf(message, sizeof(message), "Regeneraste 1 de vida ao descansar.                 ");
-            add_message(msg_window, message);
+            
         }
         else snprintf(message, sizeof(message), "Não consegues regenerar mais      ");
         add_message(msg_window,message);
@@ -280,16 +277,25 @@ void remove_mob(MOB *mobs, int *num_mobs, int index) {
 
 
 void update_stats_window(WINDOW *stats_window, STATE *st) {
-    wclear(stats_window); // limpa a janela antes de atualizar
+    wclear(stats_window); // Limpa a janela antes de atualizar
 
-    // adiciona os stats do player à janela
-    wattron(stats_window, COLOR_PAIR(STATS));
-    mvwprintw(stats_window, 1, 1, "HP: %d", st->playerHp);
-    mvwprintw(stats_window, 2, 1, "ATK: %d", st->playerAtk);
-    mvwprintw(stats_window, 3, 1, "DEF: %d", st->playerDef);
-    wattroff(stats_window, COLOR_PAIR(STATS));
+    // Adiciona os stats do player à janela
+    mvwprintw(stats_window, 1, 1, "HP ");
+    wattron(stats_window, COLOR_PAIR(19)); // Define a cor para HP
+    mvwprintw(stats_window, 2, 1, "%d", st->playerHp);
+    wattroff(stats_window, COLOR_PAIR(19)); // Desativa a cor para HP
 
-    wrefresh(stats_window); // atualiza a janela na tela
+    mvwprintw(stats_window, 4, 1, "ATK");
+    wattron(stats_window, COLOR_PAIR(21)); // Define a cor para ATK
+    mvwprintw(stats_window, 5, 1, "%d ", st->playerAtk);
+    wattroff(stats_window, COLOR_PAIR(20)); // Desativa a cor para ATK
+
+    mvwprintw(stats_window, 7, 1, "DEF");
+    wattron(stats_window, COLOR_PAIR(20)); // Define a cor para DEF
+    mvwprintw(stats_window, 8, 1, "%d ", st->playerDef);
+    wattroff(stats_window, COLOR_PAIR(20)); // Desativa a cor para DEF
+
+    wrefresh(stats_window); // Atualiza a janela na tela
 }
 
 
