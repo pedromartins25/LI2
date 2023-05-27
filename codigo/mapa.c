@@ -790,7 +790,7 @@ char message[100];
         break;
     }
    // Adicione uma mensagem à janela de mensagens
-   snprintf(message, sizeof(message), "Item apanhado.\n"); // // TAREFA, tentar adicionar nome do item na mensagem. Criar array char messagem[100] e utilizar o snprintf, não consegui aceder ao nome do item.
+   snprintf(message, sizeof(message), "Item apanhado.\n"); // TAREFA, tentar adicionar nome do item na mensagem. Criar array char messagem[100] e utilizar o snprintf, não consegui aceder ao nome do item.
    add_message(msg_window, message);
    }
 }

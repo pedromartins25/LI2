@@ -14,6 +14,9 @@
 // Variáveis globais para controlar o temporizador
 time_t start_time;
 double timer_duration = 1.0; // 1 segundo
+bool isRegenerating = false;
+char message[100]; 
+
 
 
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
@@ -97,6 +100,19 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             itemPickUp(st, 2, msg_window);
             do_movement_action(st, mobs, num_mobs,+1, +1, msg_window); 
             drawlight(st, rows, cols); 
+            break;
+        case 'r':
+            if (st->playerHp < 100) {
+            st->playerHp += 1;  // Regenera a vida do jogador
+               if (st->playerHp > 100) {
+                st->playerHp = 100;
+            }
+            do_movement_action(st, mobs, num_mobs,0, 0, msg_window);
+            snprintf(message, sizeof(message), "Regeneraste um de vida ao descansar.                 ");
+            add_message(msg_window, message);
+        }
+        else snprintf(message, sizeof(message), "Descansaste mas não foi regenerada qualquer vida");
+        add_message(msg_window,message);
             break;
         case 'q': 
             endwin();
@@ -312,12 +328,12 @@ Item temp;
     }
     st->inv[st->equipPos-3].quantity --;
     // Adicione uma mensagem à janela de mensagens
-    const char* message = "Curado!";
+    snprintf(message, sizeof(message), "Curado!\n");
     add_message(msg_window, message); 
    }
    else {
     // Adicione uma mensagem à janela de mensagens
-    const char* message = "Não é possível equipar!";
+    const char* message = "Não é possível equipar!\n";
     add_message(msg_window, message);  
    }
   }
@@ -456,7 +472,7 @@ void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
     // Cria uma mensagem com o dano causado pela mob
     char message[100];
-    snprintf(message, sizeof(message), "%s causou %d de dano.", mob-> name,damage_to_player);
+    snprintf(message, sizeof(message), "%s causou %d de dano.                      ", mob-> name,damage_to_player);
 
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
@@ -604,11 +620,14 @@ void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
     }
 }
 
+void rest(STATE *st) {
+    st->playerHp += 1; // Incrementa a vida do jogador
+    if (st->playerHp > 100) {
+        st->playerHp = 100; // Limita a vida máxima do jogador
+    }
 
-
-
-
-
+    // Atualiza a tela ou qualquer outra ação necessária durante o descanso
+}
 
 
 
