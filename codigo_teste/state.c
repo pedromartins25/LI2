@@ -22,6 +22,7 @@ char message[100];
 void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stats_window, MessageWindow *msg_window, int ncols){
 
     int key = getch();
+    int l = 0;
     WINDOW *inv_window;
     WINDOW *equip_window;
 
@@ -127,13 +128,17 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             wrefresh(inv_window);
             break;
         case ERR:
-          update_enemy_states(st, mobs, num_mobs, rows, cols, msg_window); 
+          update_enemy_states(st, mobs, num_mobs, rows, cols, msg_window);
+          l = 1; 
           break;
     }
 
 
             // Atualiza o estado dos inimigos
+       if (l == 0) {
         update_enemy_states(st, mobs, num_mobs, rows, cols, msg_window); 
+       }
+       else l = 0;
 }
     else {
        switch(key) {
@@ -519,10 +524,10 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
                 
                 char c = mvinch(new_x,new_y);
                 // Verifica se o novo local está dentro dos limites do mapa
-                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols && mapa_pode_andar(new_x, new_y)) {
-                   if (c=='.' || c=='h') {n = 1; mobs[i].dark = true;}
+                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+                   if (c=='.' || c=='h' || (c!='-'&&c!='+'&&c!=' '&&c!='H'&&c!='@')) {n = 1; mobs[i].dark = true;}
                    else if (c=='-' || c=='+') {n = 2; mobs[i].dark = false;}
-                       else if (c==' ' || c=='H') {n = 3; mobs[i].seen = true;}// Marca a MOB como vista
+                       else if (c==' ' || c=='H' || c=='@') {n = 3; mobs[i].seen = true;}// Marca a MOB como vista
                   
                 draw_prevMob(px,py,n);
                    
@@ -559,6 +564,11 @@ void draw_prevMob(int x, int y, int n) {
         mvaddch(x, y, ' ');
         attroff(COLOR_PAIR(2));  
        }
+       else if (n==0) {
+        attron(COLOR_PAIR(6));
+        mvaddch(x, y, 'V');
+        attroff(COLOR_PAIR(6));        
+       }
   }
 }
 
@@ -579,11 +589,6 @@ void draw_mob(MOB mob, int playerX, int playerY) {
         attron(COLOR_PAIR(1));  // mob não visível e nunca foi vista - cor preta
         mvaddch(mob.x, mob.y, mob.symbol);
         attroff(COLOR_PAIR(1));
-       }
-       else {
-        attron(COLOR_PAIR(6));  
-        mvaddch(mob.x, mob.y, mob.symbol);
-        attroff(COLOR_PAIR(6));       
        }
     }
    }
@@ -620,32 +625,27 @@ void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
     // Calcula as novas coordenadas do inimigo
     int new_x = zombie->x + dx;
     int new_y = zombie->y + dy;
-
+                int px = zombie->x;
+                int py = zombie->y;
+                int n = 0;
+                
     // Verifica se o novo local está dentro dos limites do mapa
     if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
-        // Apaga o caractere na posição anterior
-        mvaddch(zombie->x, zombie->y, ' ');
-
-        // Verifica se o novo local está dentro da distância permitida do jogador
-        if (is_enemy_adjacent_to_player(zombie, st->playerX, st->playerY)) {
-            attron(COLOR_PAIR(2));
-            mvaddch(zombie->x, zombie->y, ' ');
-            attroff(COLOR_PAIR(2));
-        } else if (mvinch(new_x, new_y) == '-') {
-            attron(COLOR_PAIR(4));
-            mvaddch(zombie->x, zombie->y, '-');
-            attroff(COLOR_PAIR(4));
-        } else {
-            attron(COLOR_PAIR(1));
-            mvaddch(zombie->x, zombie->y, '.');
-            attroff(COLOR_PAIR(1));
-        }
-
+                char c = mvinch(new_x,new_y);
+                // Verifica se o novo local está dentro dos limites do mapa
+                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+                   if (c=='.' || c=='h' || (c!='-'&&c!='+'&&c!=' '&&c!='H'&&c!='@')) {n = 1; zombie->dark = true;}
+                   else if (c=='-' || c=='+') {n = 2; zombie->dark = false;}
+                       else if (c==' ' || c=='H' || c=='@') {n = 3; zombie->seen = true;}// Marca a MOB como vista
+                       
+                draw_prevMob(px,py,n);
+                                
         if (mapa_pode_andar(new_x, new_y)) {
             zombie->x = new_x;
             zombie->y = new_y;
         }
     }
+}
 }
 
 void rest(STATE *st) {
