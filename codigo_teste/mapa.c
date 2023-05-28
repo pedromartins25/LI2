@@ -9,6 +9,8 @@
 #include "state.h"
 #include "mapa.h"
 
+char message[100];
+
 
  // Listagem das salas posiveis do mapa
 void template1(int w, int k) {
@@ -34,7 +36,7 @@ void template2(int w, int k) {
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
     mvprintw(w*10+3, k*10, "h........h");
-    mvprintw(w*10+4, k*10, "..........");
+    mvprintw(w*10+4, k*10, "....S.....");
     mvprintw(w*10+5, k*10, "..........");
     mvprintw(w*10+6, k*10, "h........h");
     mvprintw(w*10+7, k*10, "h........h");
@@ -509,17 +511,76 @@ void lights(int rows, int cols) {
  }
 }
 
-void bossLevel(int rows,int cols, MOB *mobs, int num_mobs) {
-  reset_map(rows,cols);
-  for (int i=0; i<num_mobs; i++) {
-   mobs[i].x=0;
-   mobs[i].y=0;
-   mobs[i].hp=0;
-   mobs[i].atk=0;
-   mobs[i].def=0;
-   mobs[i].symbol=' ';
-   mobs[i].seen=FALSE;
-  }
+
+
+void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* msg_window) {
+    // Verifica se o boss está vivo
+    if (boss->hp > 0) {
+        // Verifica se o boss está adjacente ao jogador
+        if (is_enemy_adjacent_to_player(boss, st->playerX, st->playerY)) {
+            player_attack(st, boss, msg_window);
+        }
+        else if ((abs(boss->x - st->playerX) <= 5 && abs(boss->y - st->playerY) <= 5)) {
+            if (abs(boss->x - st->playerX) < 5 && abs(boss->y - st->playerY) < 5) {
+                int dx = rand() % 3 - 1;
+                int dy = rand() % 3 - 1;
+                int new_x = boss->x + dx;
+                int new_y = boss->y + dy;
+
+                if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
+                    if (mapa_pode_andar(new_x, new_y)) {
+                        boss->x = new_x;
+                        boss->y = new_y;
+                    }
+                }
+            }
+
+            draw_mob(*boss, st->playerX, st->playerY);
+
+            if (abs(boss->x - st->playerX) <= 3 && abs(boss->y - st->playerY) <= 3 && rand() % 100 < 20) {
+                player_attack(st, boss, msg_window);
+
+                snprintf(message, sizeof(message), "O boss atirou um feitiço");
+                add_message(msg_window, message);
+            }
+
+            if (abs(boss->x - st->playerX) <= 3 && abs(boss->y - st->playerY) <= 3 && rand() % 100 < 10) {
+                snprintf(message, sizeof(message), "O boss invocou outras mobs");
+                add_message(msg_window, message);
+            }
+        }
+    }
+}
+
+
+
+
+void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) {
+
+  reset_map(rows, cols);
+
+  // Esvaziar o array de mobs
+  memset(mobs, 0, sizeof(MOB) * num_mobs);
+
+  // Configurar os dados do boss
+  MOB boss;
+  boss.x = 20;
+  boss.y = 20;
+  boss.hp = 100;
+  boss.atk = 30;
+  boss.def = 20;
+  boss.symbol = 'B';
+  boss.seen = 0;
+
+  num_mobs= 1; 
+
+  mobs[num_mobs] = boss;
+
+  update_boss_state(st, &boss, rows, cols, msg_window);
+
+  // Resto do código...
+
+
   for (int i=0; i<rows; i++) {
    for (int j=0; j<cols; j++) {
     if (i != 0 && i != rows-1) {
@@ -546,6 +607,8 @@ void bossLevel(int rows,int cols, MOB *mobs, int num_mobs) {
 }
 
 
+
+
 void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, MOB *mobs, int num_mobs) {
     
     int x = st->playerX;
@@ -564,7 +627,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++;
            }
           else {
-            bossLevel(rows, cols, mobs, num_mobs);
+            bossLevel(st,rows, cols, mobs, num_mobs, msg_window);
             st->playerX=6; st->playerY=5;
             st->level++;            
           }
@@ -581,7 +644,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++;
            }
           else {
-            bossLevel(rows, cols, mobs, num_mobs);
+            bossLevel(st,rows, cols, mobs, num_mobs, msg_window);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
@@ -599,7 +662,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++;
            }
           else {
-            bossLevel(rows, cols, mobs, num_mobs);
+            bossLevel(st,rows, cols, mobs, num_mobs, msg_window);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
@@ -617,7 +680,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++;
            }
           else {
-            bossLevel(rows, cols, mobs, num_mobs);
+            bossLevel(st,rows, cols, mobs, num_mobs, msg_window);
             st->playerX=6; st->playerY=5;
             st->level++; 
            } 
