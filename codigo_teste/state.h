@@ -19,6 +19,7 @@
 
 #define MAX_MESSAGES 7 // Máximo de mensagens na janela
 
+
 typedef struct {
     char name[20];
     int lin, cols;

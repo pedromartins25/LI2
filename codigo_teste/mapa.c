@@ -308,7 +308,7 @@ void generate_map(int templateRows, int templateCols) {
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
-    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') return 1;
+    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W' && c != 'B') return 1;
     return 0;
 }
 
@@ -500,12 +500,19 @@ void endmap(STATE *st, int i, int rows, int cols) {
     }
 }
 
+  // Função que Ilumina o espaço à volta de tochas
 void lights(int rows, int cols) {
- for (int i = 0; i<rows; i++) {
+ for (int i = 0; i<rows; i++) {  // encontra as tochas no mapa
   for (int j = 0; j<cols; j++) {
-   if (mvinch(i,j) == 'L') {
-    STATE l = {j,i,0,0,0,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0}},0,0,0,0,0,0};
-    drawlight(&l, rows, cols);
+  char c = mvinch(i,j);
+   if (c == 'L') {  // se for tocha ilumina o quadrado 10 por 10 com centro na tocha
+    int x, y;
+    for (x=i-5; x<i+5; x++) {
+     for (y=j-5; y<j+5; y++) {
+      char b = mvinch(x,y);
+      lightaux(b,x,y);  // usa a função previamente definida
+     }
+    }
    }
   }
  }
@@ -554,7 +561,7 @@ void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* 
 
 
 
-
+  // Quando o player chega ao nível 5 cria a sala do Boss
 void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) {
 
   reset_map(rows, cols);
@@ -578,9 +585,9 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
 
   update_boss_state(st, &boss, rows, cols, msg_window);
 
-  // Resto do código...
+  // criação da sala final
 
-
+   // cria as paredes à volta do mapa
   for (int i=0; i<rows; i++) {
    for (int j=0; j<cols; j++) {
     if (i != 0 && i != rows-1) {
@@ -596,6 +603,7 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
     }
    }
   }
+   // cria as tochas distanciadas por 10 blocos pelo mapa
   for (int i=5; i<rows; i+=10) {
    for (int j=5; j<cols; j+=10) {
      attron(COLOR_PAIR(6));
@@ -603,12 +611,12 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
      attroff(COLOR_PAIR(6));
    }
   }
-  lights(rows, cols);
+  lights(rows, cols); // ilumina as tochas
 }
 
 
 
-
+  // Cria um novo nivel
 void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, MOB *mobs, int num_mobs) {
     
     int x = st->playerX;
@@ -621,17 +629,17 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
     if (i == 1) {  // no caso de andar para cima
         c = mvinch(x-1,y);
         if (c == 'S') {
-           if (st->level < 5) {
-            gerarMundo(rows, cols, mobs, num_mobs, st);
-            st->playerX=6; st->playerY=5;
-            st->level++;
+           if (st->level < 5) {  // verifica se chegou a sala do Boss
+            gerarMundo(rows, cols, mobs, num_mobs, st);  // Senão chegou cria um novo mapa
+            st->playerX=6; st->playerY=5;  // reseta o player para a primeira sala
+            st->level++;  // aumenta o nivel
            }
-          else {
+          else {  // Chegou à sala do Boss
             bossLevel(st,rows, cols, mobs, num_mobs, msg_window);
             st->playerX=6; st->playerY=5;
             st->level++;            
           }
-        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);
+        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);  // Indica que aumentou de nível
         add_message(msg_window, message);            
         }
     }

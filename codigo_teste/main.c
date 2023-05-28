@@ -105,7 +105,6 @@ int main() {
 		move(st.playerX, st.playerY);
 		update(&st, mobs, num_mobs, templateRows, templateCols, stats_window, &msg_window, ncols);
 		draw_message_window(msg_wnd, &msg_window, 0, 0);
-        lights(templateRows, templateCols);
         update_stats_window(stats_window, &st); // atualiza a janela de stats
         if (st.playerHp <=0) gameOver();
 	}

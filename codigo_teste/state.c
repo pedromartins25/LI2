@@ -12,7 +12,7 @@
 #include "mapa.h"
 
 
-char message[100]; 
+char messaget[100]; 
 
 
 
@@ -29,7 +29,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
 
     attron(COLOR_PAIR(2));
     mvaddch(st->playerX, st->playerY, ' ');
-    attroff(COLOR_PAIR(2));
+    attroff(COLOR_PAIR(2));   
     if (st->menu==0) {
     switch(key) {
         case KEY_A1:
@@ -106,11 +106,11 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
                 st->playerHp = 100;
             }
             do_movement_action(st, mobs, num_mobs,0, 0, msg_window);
-            snprintf(message, sizeof(message), "Regeneraste 1 de vida ao descansar.       ");
+            snprintf(messaget, sizeof(messaget), "Regeneraste 1 de vida ao descansar.       ");
             
         }
-        else snprintf(message, sizeof(message), "Não consegues regenerar mais      ");
-        add_message(msg_window,message);
+        else snprintf(messaget, sizeof(messaget), "Não consegues regenerar mais      ");
+        add_message(msg_window,messaget);
             break;
         case 'q': 
             endwin();
@@ -195,7 +195,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
             break;       
        }
     }
-            lights(rows,cols);
+            lights(rows,cols);  // ilumina as tochas
             update_stats_window(stats_window, st);
 }
 
@@ -244,23 +244,23 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
     if (dano <= 1){
         dano = 1 ;
-        snprintf(message, sizeof(message), "Ainda estás muito fraco, causaste 1 de dano.");
+        snprintf(message, sizeof(messaget), "Ainda estás muito fraco, causaste 1 de dano.");
     }
 
     mob->hp -= dano;
     if (mob->hp <= 0) { // Verifica se a vida da mob é menor ou igual a 0
-        snprintf(message, sizeof(message), "%s foi derrotado.\n", mob->name);
+        snprintf(message, sizeof(messaget), "%s foi derrotado.\n", mob->name);
         mob->hp = 0;
 
     }
 
     else {
-        snprintf(message, sizeof(message), "Causaste %d de dano             ", dano); 
+        snprintf(message, sizeof(messaget), "Causaste %d de dano             ", dano); 
     
    }
 
    add_message(msg_window, message);
-   snprintf(message, sizeof(message), "Hp de %s: %d\n        ", mob->name, mob->hp); 
+   snprintf(message, sizeof(messaget), "Hp de %s: %d\n        ", mob->name, mob->hp); 
    add_message(msg_window, message);
 }
 
@@ -346,8 +346,8 @@ Item temp;
     }
     st->inv[st->equipPos-3].quantity --;
     // Adicione uma mensagem à janela de mensagens
-    snprintf(message, sizeof(message), "Curado!\n");
-    add_message(msg_window, message); 
+    snprintf(messaget, sizeof(messaget), "Curado!\n");
+    add_message(msg_window, messaget); 
    }
    else {
     // Adicione uma mensagem à janela de mensagens
@@ -490,7 +490,7 @@ void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) {
 
     // Cria uma mensagem com o dano causado pela mob
     char message[100];
-    snprintf(message, sizeof(message), "%s causou %d de dano.                      ", mob-> name,damage_to_player);
+    snprintf(message, sizeof(messaget), "%s causou %d de dano.                      ", mob-> name,damage_to_player);
 
     // Adiciona a mensagem à janela de mensagens
     add_message(msg_window, message);
