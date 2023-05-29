@@ -10,12 +10,6 @@
 #define WALL 10
 #define DARKWALL 9
 #define STATS 12
-
-
-#define EQUIP_WINDOW_Y 1
-
-#define MAX_INVENTORY_SIZE 20 // Tamanho máximo do inventário
-
 #define MAX_MESSAGES 7 // Máximo de mensagens na janela
 
 
@@ -100,6 +94,8 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window);
 COORD generateRandomCoords(int rows, int cols);
 void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols);
 
+//JANELAS
 void bossDefeat();
 void gameOver();
+
 #endif

@@ -12,7 +12,9 @@
 char message[100];
 
 
- // Listagem das salas posiveis do mapa
+ /** A104444 João Serrão
+ * Lista de salas possiveis para o mapa (templates)
+ */
 void template1(int w, int k) {
     
     attron(COLOR_PAIR(1));
@@ -36,7 +38,7 @@ void template2(int w, int k) {
     mvprintw(w*10+1, k*10, "h........h");
     mvprintw(w*10+2, k*10, "h........h");
     mvprintw(w*10+3, k*10, "h........h");
-    mvprintw(w*10+4, k*10, "....S.....");
+    mvprintw(w*10+4, k*10, "..........");
     mvprintw(w*10+5, k*10, "..........");
     mvprintw(w*10+6, k*10, "h........h");
     mvprintw(w*10+7, k*10, "h........h");
@@ -189,7 +191,11 @@ void template11(int w, int k) {
     attroff(COLOR_PAIR(1));
 }
 
-  // Restrem a criação de novas salas para o mapa ser compativel
+
+
+ /** A104444 João Serrão
+ * Restrições na criação de novas salas para o mapa ser compativel
+ */
 int correct_template(int pt) {
     
     int c;
@@ -218,7 +224,9 @@ int correct_template(int pt) {
     return 2;
 }
 
-  // Cria a matriz com os numeros aleatorios que representam salas
+/** A104444 João Serrão
+ *  Cria a matriz com os numeros aleatorios que representam salas
+ */
 void generate_template(int templateRows, int templateCols, int templateMap[templateRows][templateCols]) {
 
     int i,j;
@@ -240,7 +248,9 @@ void generate_template(int templateRows, int templateCols, int templateMap[templ
 }
 }
 
-// apaga o mada no ecrã quando um novo é criado
+/** A104444 João Serrão
+ *  apaga o mada no ecrã quando um novo é criado
+ */
 void reset_map(int templateRows,int templateCols) {
  for (int i = 0; i < templateRows; i++) {
   for (int j = 0; j < templateCols; j++) {
@@ -251,7 +261,9 @@ void reset_map(int templateRows,int templateCols) {
  }
 }
 
-  // Cria e desenhas o mapa
+/** A104444 João Serrão
+ *  Criação e desenho do mapa
+ */
 void generate_map(int templateRows, int templateCols) {
     
     int i, j, n;
@@ -303,8 +315,9 @@ void generate_map(int templateRows, int templateCols) {
 }
 
 }
-
-  // Verifica se a entidade pode fazer um certo movimento
+/** A104444 João Serrão
+ *  Verifica se a entidade pode fazer um certo movimento
+ */
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
@@ -312,7 +325,9 @@ int mapa_pode_andar (int x, int y) {
     return 0;
 }
 
-  // Transforma blocos com luz em blocos sem luz
+/** A104444 João Serrão
+ *  Transforma os blocos com luz em blocos sem luz
+ */
 void eraseaux(char c, int j, int i){
 
 if (c==' ') {  // modifica o chão iluminado
@@ -343,7 +358,9 @@ else {
 }
 }
  
-  // Transforma blocos sem luz em bloco com luz
+/** A104444 João Serrão
+ *  Transforma os blocos sem luz em blocos com luz
+ */
 void lightaux(char c, int j, int i) {
 
 if (c=='.' || c=='-' || c==' ') {  // transforma o chão não iluminado
@@ -379,7 +396,9 @@ else {
 }
 }
 
-  // Função que simula luz
+/** A104444 João Serrão
+ *  Função que simula a luz
+ */
 void drawlight(STATE *st, int r, int co) {
     
     int x = st->playerX; int y = st->playerY;
@@ -415,7 +434,9 @@ void drawlight(STATE *st, int r, int co) {
 }
 }
 
-  // Função que transforma blocos iluminados em não iluminados depois do player passar de um lado do mapa para outro
+/** A104444 João Serrão
+ * Função que transforma blocos iluminados em não iluminados depois do player passar de um lado do mapa para outro
+ */
 void erase_light(int x, int y, int d, int rows, int cols){
     
     int i,j;
@@ -456,7 +477,10 @@ if (d==4) {  // no caso de o player ter movido da parede direita
 }
 
 
-  // Verifica se é possivel o player ir de uma parede do mapa para a oposta e se sim move o player
+
+/** A104444 João Serrão
+ * Verifica se é possivel o player ir de uma parede do mapa para a oposta e se sim move o player
+ */
 void endmap(STATE *st, int i, int rows, int cols) {
     
     int x = st->playerX;
@@ -500,7 +524,9 @@ void endmap(STATE *st, int i, int rows, int cols) {
     }
 }
 
-  // Função que Ilumina o espaço à volta de tochas
+/** A104444 João Serrão
+ * Função que ilumina o espaço à volta das tochas
+ */
 void lights(int rows, int cols) {
  for (int i = 0; i<rows; i++) {  // encontra as tochas no mapa
   for (int j = 0; j<cols; j++) {
@@ -519,8 +545,10 @@ void lights(int rows, int cols) {
 }
 
 
-
-void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* msg_window) { // A93617 Pedro Martins "Implementação das mecânicas do boss"
+/** A93617 Pedro Martins
+ * Implementação das mecânicas do boss
+ */
+void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* msg_window) {
 
     if (boss->hp > 0) {
         // Verifica se o boss está adjacente ao jogador
@@ -558,8 +586,10 @@ void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* 
 
 
 
-
-void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) { // A93617 Pedro Martins "Criação da sala do boss e implementação do monstro"
+/** A93617 Pedro Martins A104444 João Serrão
+ * Criação da sala do boss e implementação do monstro
+ */
+void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) {
 
   reset_map(rows, cols);
 
@@ -574,7 +604,7 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
   boss.y = cols/2+1;
   boss.hp = 100;
   boss.atk = 30;
-  boss.def = 20;
+  boss.def = 30;
   boss.symbol = 'B';
   boss.seen = 0;
 
@@ -615,7 +645,9 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
 
 
 
-  // Cria um novo nivel
+/** A104444 João Serrão
+ * Criação de um novo nivel
+ */
 void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, MOB *mobs, int num_mobs) {
     
     int x = st->playerX;
@@ -712,7 +744,11 @@ Item items[10] = {{"Faca", 1, 2, '!',2,1,0},
 
 
 
-void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatóriamente as coordenadas e tipo do item
+
+/** A104444 João Serrão
+ * Cria aleatóriamente as coordenadas e tipo do item
+ */
+void gerar_Random_item(int templateRows, int templateCols) {
     
     int x, y, r;
     Item item;
@@ -732,12 +768,19 @@ void gerar_Random_item(int templateRows, int templateCols) {  // cria aleatória
        refresh();
 }
 
-int typecheck(int t, int it) {  // verifica se os items são do mesmo tipo
+
+/** A104444 João Serrão
+ * Verifica se os items são do mesmo tipo
+ */
+int typecheck(int t, int it) {
  if (t == it) return 1;
  return 0;
 }
 
-int exists(Item it, int len, Item inv[len]) {  // verifica se um item stackable já existe e devole a sua posição
+/** A104444 João Serrão
+ * Verifica se um item stackable já existe e devole a sua posição
+ */
+int exists(Item it, int len, Item inv[len]) {
 int i;
  for (i=0; i<len; i++) {
   if (typecheck(inv[i].type, it.type)) {
@@ -747,7 +790,11 @@ int i;
  return 0;
 }
 
-Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudando o nome e stats
+
+/** A104444 João Serrão
+ * Cria um item depois de ser apanhado, mudando o nome e stats
+ */
+Item createItem(Item i, int l) {
     int j;
     double probabilities[] = {0.5, 0.25, 0.15, 0.075, 0.025};  // cria probabilidades para os items
     double rn = (double) rand() / RAND_MAX;
@@ -783,7 +830,12 @@ Item createItem(Item i, int l) {  // cria um item depois de ser apanhado, mudand
   return i;
 }
 
-void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona items ao inventário e modifica os stats do player
+
+
+/** A104444 João Serrão
+ * Adiciona items ao inventário e modifica os stats do player
+ */ 
+void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {
 int i=0;
 char message[100];
 char name[100];
@@ -882,7 +934,9 @@ char name[100];
 }
 
 
-
+/** A104444 João Serrão
+ * Função para o jogador apanhar o item
+ */ 
 void itemPickUp(STATE *st, int i, MessageWindow* msg_window) {
     
     int x = st->playerX;
@@ -907,7 +961,9 @@ void itemPickUp(STATE *st, int i, MessageWindow* msg_window) {
     }
 }
 
-  // função principal da criação de mapas
+/** A104444 João Serrão
+ * Função principal da criação de mapas
+ */ 
 void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STATE *st) {
     
     int i;
@@ -932,4 +988,3 @@ void gerarMundo(int templateRows, int templateCols, MOB *mobs, int num_mobs, STA
     }
 
 }
-
