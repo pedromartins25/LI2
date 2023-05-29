@@ -13,7 +13,7 @@
 
 
 int main() {
-	STATE st = {5,5,100,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
+	STATE st = {5,5,10000,10,10,{{"Tocha", 0, 0, 'T',0,0,0}},{{"Espada Quebrada",0,0, 'E',0,1,0},{"Armadura Velha",0,0, 'E',0,9,0},{"Colar de fio",0,0, 'E',0,10,0}},0,8,3,1, 0, 1};
 
     MOB mobs[MAX_MOBS];
     mobs[0] = (MOB){"Stupid zombie",15, 15, 12, 12, 12, '&', false, true}; //name, posx, posy, hp, atk, def, symbol, seen; STUPID 

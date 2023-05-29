@@ -201,7 +201,7 @@ void update(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, WINDOW *stat
 
 
 
-void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, MessageWindow* msg_window) {
+void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, MessageWindow* msg_window) { // A93617 Pedro Martins "Movimento do jogador com procura de mobs e realização de ataques caso esteja perto"
     int new_x = st->playerX + dx;
     int new_y = st->playerY + dy;
 
@@ -236,7 +236,7 @@ void do_movement_action(STATE *st, MOB *mobs, int num_mobs, int dx, int dy, Mess
 
 
 // Função para atacar uma mob
-void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
+void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) { // A93617 Pedro Martins "Função para realizar o ataque do jogador à mob"
     // Reduz a vida da mob com base no ataque do jogador
     int dano;
     char message[100]; 
@@ -264,8 +264,8 @@ void attack_mob(STATE *st, MOB *mob, MessageWindow* msg_window) {
    add_message(msg_window, message);
 }
 
-// Função para remover uma mob da lista de mobs
-void remove_mob(MOB *mobs, int *num_mobs, int index) {
+
+void remove_mob(MOB *mobs, int *num_mobs, int index) { // A93617 Pedro Martins "Função para remover uma mob da lista de mobs"
         attron(COLOR_PAIR(2));
         mvaddch(mobs[index].x, mobs[index].y, ' ');
         attroff(COLOR_PAIR(2));  
@@ -277,7 +277,7 @@ void remove_mob(MOB *mobs, int *num_mobs, int index) {
 }
 
 
-void update_stats_window(WINDOW *stats_window, STATE *st) {
+void update_stats_window(WINDOW *stats_window, STATE *st) { // A93617 Pedro Martins "Atualização da janela dos stats"
     wclear(stats_window); // Limpa a janela antes de atualizar
 
     // Adiciona os stats do player à janela
@@ -416,11 +416,11 @@ void addItem(Item *inv, int *len, Item newItem) {
     (*len)++;
 }
 
-void init_message_window(MessageWindow* msg_window) {
+void init_message_window(MessageWindow* msg_window) { // A93617 Pedro Martins "Inicialização da janela de mensagens"
     msg_window->num_messages = 0;
 }
 
-void add_message(MessageWindow* msg_window, const char* message) {
+void add_message(MessageWindow* msg_window, const char* message) { // A93617 Pedro Martins "Função para adicionar uma mensagem à janela de mensagens"
     if (msg_window->num_messages <= MAX_MESSAGES) {
      if (msg_window->num_messages > 1) {
         // Move todas as mensagens existentes uma posição para cima
@@ -450,7 +450,7 @@ void add_message(MessageWindow* msg_window, const char* message) {
 }
 
 
-void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col) {
+void draw_message_window(WINDOW* window, MessageWindow* msg_window, int start_row, int start_col) { // A93617 Pedro Martins "Função para desenhar a janela de mensagens"
     box(window, 0, 0);
 
     int row = start_row + 1;
@@ -483,7 +483,7 @@ int i;
    add_message(msg_window, message);
 }
 
-void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) {
+void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) { // A93617 Pedro Martins "Função para realizar o ataque da mob"
     int damage_to_player = mob->atk - st->playerDef;
     if (damage_to_player > 0) {
         st->playerHp -= damage_to_player;
@@ -498,30 +498,35 @@ void player_attack(STATE *st, MOB *mob, MessageWindow* msg_window) {
     }
 }
 
-int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY) {
+int is_enemy_adjacent_to_player(const MOB *enemy, int playerX, int playerY) { // A93617 Pedro Martins "Função para calcular a distancia entre o jogador e a mob"
     return abs(enemy->x - playerX) <= 1 && abs(enemy->y - playerY) <= 1;
 }
 
 
 
 
-void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window) {
-
+void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols, MessageWindow* msg_window) { // A93617 Pedro Martins "Atualização do estado das mobs, para atacar, para perseguir, etc"
     for (int i = 0; i < num_mobs; i++) {
-                int px = mobs[i].x;
-                int py = mobs[i].y;
-                int n = 0;
+        int px = mobs[i].x;
+        int py = mobs[i].y;
+        int n = 0;
+
         // Verifica se o inimigo está vivo
         if (mobs[i].hp > 0) {
             // Verifica se o inimigo está adjacente ao jogador
             if (is_enemy_adjacent_to_player(&mobs[i], st->playerX, st->playerY)) {
                 player_attack(st, &mobs[i], msg_window);
             }
-
-            else if ((abs(mobs[i].x - st-> playerX) <= 3 && abs(mobs[i].y - st-> playerY) <= 3) && (mobs[i].symbol == '&')) {
-                 zombie_persegue(st, &mobs[i], rows, cols);
-             }  
-
+            else if ((abs(mobs[i].x - st->playerX) <= 3 && abs(mobs[i].y - st->playerY) <= 3) && (mobs[i].symbol == '&')) {
+                zombie_persegue(st, &mobs[i], rows, cols);
+            }
+            else if ((abs(mobs[i].x - st->playerX) <= 3 && abs(mobs[i].y - st->playerY) <= 3) && (mobs[i].symbol == 'B')) {
+                if (rand() % 100 < 10) {  // 10% de probabilidade
+                    snprintf(messaget, sizeof(messaget), "%s atirou um feitiço!", mobs[i].name);
+                    add_message(msg_window, messaget);
+                    player_attack(st, &mobs[i], msg_window);
+                }
+            }
             else {
                 // Caso contrário, move o inimigo aleatoriamente
                 int dx = rand() % 3 - 1;
@@ -529,18 +534,25 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
                 int new_x = mobs[i].x + dx;
                 int new_y = mobs[i].y + dy;
                 
-                char c = mvinch(new_x,new_y);
+                char c = mvinch(new_x, new_y);
                 // Verifica se o novo local está dentro dos limites do mapa
                 if (new_x >= 0 && new_x < rows && new_y >= 0 && new_y < cols) {
-                   if (c=='.' || c=='h' || (c!='-'&&c!='+'&&c!=' '&&c!='H'&&c!='@')) {n = 1; mobs[i].dark = true;}
-                   else if (c=='-' || c=='+') {n = 2; mobs[i].dark = false;}
-                       else if (c==' ' || c=='H' || c=='@') {n = 3; mobs[i].seen = true;}// Marca a MOB como vista
-                  
-                draw_prevMob(px,py,n);
-                   
+                    if (c == '.' || c == 'h' || (c != '-' && c != '+' && c != ' ' && c != 'H' && c != '@')) {
+                        n = 1;
+                        mobs[i].dark = true;
+                    }
+                    else if (c == '-' || c == '+') {
+                        n = 2;
+                        mobs[i].dark = false;
+                    }
+                    else if (c == ' ' || c == 'H' || c == '@') {
+                        n = 3;
+                        mobs[i].seen = true; // Marca a MOB como vista
+                    }
+                    
+                    draw_prevMob(px, py, n);
 
                     // Verifica se o novo local está dentro da distância permitida do jogador
-
                     if (mapa_pode_andar(new_x, new_y)) {
                         mobs[i].x = new_x;
                         mobs[i].y = new_y;
@@ -553,6 +565,8 @@ void update_enemy_states(STATE *st, MOB *mobs, int num_mobs, int rows, int cols,
         }
     }
 }
+
+
 
 void draw_prevMob(int x, int y, int n) {
   if (n == 1) {
@@ -602,7 +616,7 @@ void draw_mob(MOB mob, int playerX, int playerY) {
 }
 
 
-COORD generateRandomCoords(int rows, int cols) {
+COORD generateRandomCoords(int rows, int cols) { // A93617 Pedro Martins "Função para gerar coordenadas aleatórias para as mobs"
     COORD coords;
     coords.x = rand() % rows;
     coords.y = rand() % cols;
@@ -615,7 +629,7 @@ COORD generateRandomCoords(int rows, int cols) {
 }
 
 
-void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
+void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) { // A93617 Pedro Martins "Perseguição do jogador por parte do zombie"
     // Calcula a direção na qual o inimigo deve se mover para perseguir o jogador
     int dx = 0, dy = 0;
     if (st->playerX < zombie->x) {
@@ -655,59 +669,50 @@ void zombie_persegue(STATE *st, MOB *zombie, int rows, int cols) {
 }
 }
 
-void rest(STATE *st) {
+void rest(STATE *st) { // A93617 Pedro Martins "Reg de vida do player"
     st->playerHp += 1; // Incrementa a vida do jogador
     if (st->playerHp > 100+st->equip[2].stat) {
         st->playerHp = 100+st->equip[2].stat; // Limita a vida máxima do jogador
     }
 
-    // Atualiza a tela ou qualquer outra ação necessária durante o descanso
 }
 
 
 
 
+void bossDefeat() { // A93617 Pedro Martins "Ultima janela"
+    clear();  // Limpa a tela
+    refresh();
+
+    // Cria uma nova janela para exibir "Jogo vencido" em tamanho grande
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    WINDOW* boss_defeat_win = newwin(rows, cols, 0, 0);
+
+    // Configura as cores
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    attron(COLOR_PAIR(1) | A_BOLD);
+
+    
+    int x = (cols - 9) / 2;
+    int y = rows / 2;
+
+    mvwprintw(boss_defeat_win, y, x, "BOSS DERROTADO! JOGO VENCIDO! PARABÉNS!");
+
+    // Atualiza a janela e aguarda um tempo antes de encerrar o jogo
+    wrefresh(boss_defeat_win);
+    napms(2000);  // Aguarda 2 segundos
+
+    // Limpa a janela e libera a memória
+    delwin(boss_defeat_win);
+    endwin();
+    exit(0);  // Encerra o programa
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void gameOver() {
+void gameOver() { // A93617 Pedro Martins "Janela de Gameover"
     clear();  // Limpa a tela
     refresh();
 

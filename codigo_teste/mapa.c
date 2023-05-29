@@ -308,7 +308,7 @@ void generate_map(int templateRows, int templateCols) {
 int mapa_pode_andar (int x, int y) {
     char c = mvinch(x,y);
     
-    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W' && c != 'B') return 1;
+    if (c != 'H' && c != 'h' && c != '+' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W' && c != 'B' && c != 'T') return 1;
     return 0;
 }
 
@@ -520,8 +520,8 @@ void lights(int rows, int cols) {
 
 
 
-void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* msg_window) {
-    // Verifica se o boss está vivo
+void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* msg_window) { // A93617 Pedro Martins "Implementação das mecânicas do boss"
+
     if (boss->hp > 0) {
         // Verifica se o boss está adjacente ao jogador
         if (is_enemy_adjacent_to_player(boss, st->playerX, st->playerY)) {
@@ -551,18 +551,15 @@ void update_boss_state(STATE *st, MOB *boss, int rows, int cols, MessageWindow* 
                 add_message(msg_window, message);
             }
 
-            if (abs(boss->x - st->playerX) <= 3 && abs(boss->y - st->playerY) <= 3 && rand() % 100 < 10) {
-                snprintf(message, sizeof(message), "O boss invocou outras mobs");
-                add_message(msg_window, message);
-            }
+            if (boss->hp <= 0) bossDefeat();
         }
     }
 }
 
 
 
-  // Quando o player chega ao nível 5 cria a sala do Boss
-void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) {
+
+void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWindow* msg_window) { // A93617 Pedro Martins "Criação da sala do boss e implementação do monstro"
 
   reset_map(rows, cols);
 
@@ -571,8 +568,10 @@ void bossLevel(STATE *st, int rows,int cols, MOB *mobs, int num_mobs, MessageWin
 
   // Configurar os dados do boss
   MOB boss;
-  boss.x = 20;
-  boss.y = 20;
+  strncpy(boss.name, "Senhor das Trevas", sizeof(boss.name) - 1);
+  boss.name[sizeof(boss.name) - 1] = '\0';
+  boss.x = rows/2;
+  boss.y = cols/2+1;
   boss.hp = 100;
   boss.atk = 30;
   boss.def = 20;
@@ -639,7 +638,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->playerX=6; st->playerY=5;
             st->level++;            
           }
-        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);  // Indica que aumentou de nível
+        snprintf(message, sizeof(message), "Subiu para o nivel %d \n          ", st->level);  // Indica que aumentou de nível
         add_message(msg_window, message);            
         }
     }
@@ -657,7 +656,7 @@ void nextlevel(STATE *st, int i, int rows, int cols, MessageWindow* msg_window, 
             st->level++; 
            } 
         // Adicione uma mensagem à janela de mensagens
-        snprintf(message, sizeof(message), "Subiu para o nivel %d", st->level);
+        snprintf(message, sizeof(message), "Subiu para o nivel %d \n            ", st->level);
         add_message(msg_window, message);            
         }
     }
@@ -788,7 +787,7 @@ void itemUpdate(STATE *st, char c, MessageWindow* msg_window) {  // Adiciona ite
 int i=0;
 char message[100];
 char name[100];
-  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W') {
+  if ( c != 'H' && c != ' ' && c != '-' && c != '+' && c != '.' && c != 'h' && c != 'M' && c != 'L' && c != '&' && c != '~' && c != 'W' && c != 'T') {
     switch(c) {
     case '!': 
         st->inv[st->len]=createItem(items[0], st->level); // adiciona o item ao inventário
