@@ -1,6 +1,8 @@
-# Projeto de Laboratórios de Informática 2
+# Laboratórios de Informática 2 project
+
+Roguelike game
 
 
-Desenvolvido por:
+Developed by:
 João Serrão
 Pedro Martins
