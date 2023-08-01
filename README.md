@@ -4,5 +4,4 @@ Roguelike game
 
 
 Developed by:
-João Serrão
-Pedro Martins
+João Serrão & Pedro Martins
